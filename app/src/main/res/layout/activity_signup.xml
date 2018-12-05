@@ -30,8 +30,18 @@
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="140dp"
+            android:layout_height="103dp"
             android:src="@drawable/elranchologo" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/action_sign_up"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/SaddleBrown"
+            android:textSize="18dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="5dp"/>
 
         <AutoCompleteTextView
             android:id="@+id/username"
@@ -39,11 +49,12 @@
             android:layout_height="35dp"
             android:layout_marginBottom="11dp"
             android:background="@drawable/edittext_background"
-            android:drawableLeft="@drawable/ic_username"
-            android:hint="@string/prompt_username"
+            android:drawableStart="@drawable/ic_username"
+            android:hint="@string/username"
             android:inputType="textEmailAddress"
             android:maxLines="1"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:text="smanager98"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -55,19 +66,58 @@
                 android:layout_height="35dp"
                 android:background="@drawable/edittext_background"
                 android:drawableLeft="@drawable/ic_password"
-                android:hint="@string/prompt_password"
+                android:hint="@string/password"
                 android:imeActionId="6"
-                android:imeActionLabel="@string/prompt_password"
+                android:imeActionLabel="@string/password"
                 android:imeOptions="actionUnspecified"
                 android:inputType="textPassword"
                 android:maxLines="1"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:text="smsmsm"/>
 
             <cyd.awesome.material.AwesomeText
-                android:id="@+id/pwd_show_hide"
+                android:id="@+id/signup_pwd_show_hide"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignRight="@id/password"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="15dp"
+                android:textColor="@color/Tan"
+                android:textSize="25sp"
+                app:awesome_font="material_design"
+                app:awesome_icon="MD_VISIBILITY_OFF" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/confirm_password"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="@drawable/ic_password"
+                android:hint="@string/confirm_password"
+                android:imeActionId="6"
+                android:imeActionLabel="@string/password"
+                android:imeOptions="actionUnspecified"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="smsmsm"/>
+
+            <cyd.awesome.material.AwesomeText
+                android:id="@+id/signup_confirm_pwd_show_hide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/confirm_password"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="15dp"
@@ -87,20 +137,22 @@
             android:layout_height="35dp"
             android:layout_marginBottom="11dp"
             android:background="@drawable/edittext_background"
-            android:drawableLeft="@drawable/ic_email"
-            android:hint="@string/prompt_email"
+            android:drawableStart="@drawable/ic_email"
+            android:hint="@string/email"
             android:inputType="textEmailAddress"
             android:maxLines="1"
-            android:singleLine="true" />
+            android:singleLine="true"
 
-        <AutoCompleteTextView
+            android:text="smanager99@elranchoinc.com"/>
+
+        <Spinner
             android:id="@+id/store"
             android:layout_width="match_parent"
             android:layout_height="35dp"
             android:layout_marginBottom="11dp"
             android:background="@drawable/edittext_background"
-            android:drawableLeft="@drawable/ic_business_center_black_24dp"
-            android:hint="@string/prompt_store"
+            android:drawableStart="@drawable/ic_business_center_black_24dp"
+            android:hint="@string/store"
             android:inputType="textEmailAddress"
             android:maxLines="1"
             android:singleLine="true" />
@@ -108,6 +160,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -140,7 +194,7 @@
 
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="19dp"
-                android:backgroundTint="@color/SaddleBrown"
+                android:background="@drawable/button_signup_background"
                 android:text="@string/action_sign_up"
                 android:textColor="@color/White"
                 android:textStyle="bold" />

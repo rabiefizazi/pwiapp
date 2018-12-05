@@ -19,12 +19,12 @@
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="match_parent"
+            android:layout_width="214dp"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:text="Please select your department"
             android:textColor="@color/White"
-            android:textStyle="bold"
-            android:gravity="center"/>
+            android:textStyle="bold" />
     </android.support.v7.widget.CardView>
 
 
@@ -50,7 +50,7 @@
 
                 <ImageView
                     android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_height="80dp"
                     android:gravity="center"
                     android:padding="5dp"
                     android:src="@drawable/bakery_icon" />
@@ -82,7 +82,7 @@
 
                 <ImageView
                     android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_height="80dp"
                     android:padding="5dp"
                     android:src="@drawable/cake_icon" />
 
@@ -121,7 +121,7 @@
 
                 <ImageView
                     android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_height="80dp"
                     android:padding="5dp"
                     android:src="@drawable/dairy_icon" />
 
@@ -152,7 +152,7 @@
 
                 <ImageView
                     android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_height="80dp"
                     android:padding="5dp"
                     android:src="@drawable/kitchen_icon" />
 
@@ -191,7 +191,7 @@
 
                 <ImageView
                     android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_height="80dp"
                     android:padding="5dp"
                     android:src="@drawable/meat_icon" />
 
@@ -222,7 +222,7 @@
 
                 <ImageView
                     android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_height="80dp"
                     android:padding="5dp"
                     android:src="@drawable/produce_icon" />
 
@@ -261,7 +261,7 @@
 
                 <ImageView
                     android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_height="80dp"
                     android:padding="5dp"
                     android:src="@drawable/seafoods_icon" />
 
@@ -293,7 +293,7 @@
 
                 <ImageView
                     android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_height="80dp"
                     android:padding="5dp"
                     android:src="@drawable/tortilleria_icon" />
 

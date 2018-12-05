@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="stores_array">
+        <item>1008</item>
+        <item>1009</item>
+        <item>1010</item>
+        <item>1012</item>
+        <item>1014</item>
+        <item>1015</item>
+        <item>1016</item>
+        <item>1019</item>
+        <item>1022</item>
+        <item>1023</item>
+        <item>1024</item>
+        <item>1025</item>
+        <item>1026</item>
+        <item>1028</item>
+        <item>1029</item>
+        <item>1030</item>
+        <item>1031</item>
+        <item>1032</item>
+        <item>1033</item>
+        <item>1034</item>
+        <item>1035</item>
+        <item>1036</item>
+        <item>1037</item>
+    </string-array>
+</resources>

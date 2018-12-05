@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:orientation="horizontal">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:id="@+id/a1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="13dp"
+            android:text="Vendor Item: "
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/b1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/a1"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="51dp"
+            android:layout_marginEnd="10dp"
+            android:text="Description: "
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/c1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/a1"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="49dp"
+            android:text="Cost per unit: "
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/d1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="123dp"
+            android:text="Unit measure: "
+            android:textSize="18dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/a2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="13dp"
+            android:text="123456789"
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/b2"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_alignEnd="@+id/a2"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="51dp"
+            android:layout_marginEnd="-110dp"
+            android:text="Meat item number 123.1"
+            android:textSize="18dp" />
+        <TextView
+            android:id="@+id/c2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/a2"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="49dp"
+            android:text="$ 5.99"
+            android:textSize="18dp" />
+
+
+        <TextView
+            android:id="@+id/d2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="123dp"
+            android:text="lb"
+            android:textSize="18dp" />
+    </RelativeLayout>
+</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:gravity="center"
+        android:layout_marginTop="65dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter quantity"
+            android:textSize="18dp"
+            android:layout_marginRight="15dp"/>
+        <AutoCompleteTextView
+            android:id="@+id/quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/edittext_background"
+            android:textSize="21dp"
+            android:ems="5"
+            android:maxLines="1"
+            android:singleLine="true"/>
+    </LinearLayout>
+</LinearLayout>
