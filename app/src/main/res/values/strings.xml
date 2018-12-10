@@ -8,6 +8,7 @@
     <string name="store">Store</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_up">Sign up</string>
+    <string name="sing_out">Sign out</string>
     <string name="dont_have_account"> Don\'t have an account yet?</string>
     <string name="have_account"> Already have an account? </string>
     <string name="register">Register</string>
@@ -23,5 +24,6 @@
     <string name="activity_departments">Departments</string>
     <string name="title_activity_inventory_count_summary">Inventory Count Summary</string>
     <string name="title_activity_inventory_count_details">Inventory Count details</string>
+    <string name="title_activity_delete">delete</string>
 
 </resources>

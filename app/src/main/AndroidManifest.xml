@@ -3,7 +3,7 @@
     package="com.elrancho.pwi.pwi_app">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -27,17 +27,19 @@
         </activity>
         <activity
             android:name=".activities.DepartmentActivity"
-            android:label="@string/activity_departments">
-
-        </activity>
+            android:label="@string/activity_departments" />
         <activity
-            android:name=".activities.InventoryCountSummary"
-            android:label="@string/title_activity_inventory_count_summary">
+            android:name=".activities.InventoryCountSummaryActivity"
+            android:label="@string/title_activity_inventory_count_summary" >
 
         </activity>
-        <activity android:name=".activities.InventoryCountDetails" />
-
-        <activity android:name=".activities.SignupActivity">
+        <activity android:name=".activities.InventoryCountDetailsActivity" />
+        <activity android:name=".activities.SignupActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.LoginActivity" />
+        </activity>
+        <activity android:name=".activities.FrontActivity">
 
         </activity>
     </application>

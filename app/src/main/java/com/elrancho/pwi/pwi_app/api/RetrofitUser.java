@@ -1,6 +1,5 @@
 package com.elrancho.pwi.pwi_app.api;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import okhttp3.OkHttpClient;
@@ -26,8 +25,6 @@ public class RetrofitUser {
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
                 .build();
-
-
     }
 
     public static synchronized RetrofitUser getInstance() {

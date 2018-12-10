@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.elrancho.pwi.pwi_app.R;
 
-public class InventoryCountDetails extends Activity {
+public class InventoryCountDetailsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

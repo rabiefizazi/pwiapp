@@ -1,11 +1,14 @@
 package com.elrancho.pwi.pwi_app.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.ArrayMap;
 import android.util.Patterns;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -15,8 +18,10 @@ import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.api.RetrofitUser;
+import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 
 import org.json.JSONObject;
+
 import java.util.Map;
 
 import cyd.awesome.material.AwesomeText;
@@ -27,15 +32,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SignupActivity extends Activity implements View.OnClickListener {
+public class SignupActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText etUsername, etPassword, etConfirmPassword, etEmail;
+    private EditText etUsername, etPassword, etEmail;
     private Spinner sStore;
-    private TextView tvSignin;
 
     private boolean pwd_status = true;
 
-    private AwesomeText pwdShowHide, confirmPwdShowHide;
+    private AwesomeText pwdShowHide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +48,10 @@ public class SignupActivity extends Activity implements View.OnClickListener {
 
         etUsername = findViewById(R.id.username);
         etPassword = findViewById(R.id.password);
-        etConfirmPassword = findViewById(R.id.confirm_password);
         etEmail = findViewById(R.id.email);
         sStore = findViewById(R.id.store);
 
         pwdShowHide = findViewById(R.id.signup_pwd_show_hide);
-        confirmPwdShowHide = findViewById(R.id.signup_confirm_pwd_show_hide);
 
         findViewById(R.id.btn_Sign_up).setOnClickListener(this);
         findViewById(R.id.sign_in).setOnClickListener(this);
@@ -80,25 +82,17 @@ public class SignupActivity extends Activity implements View.OnClickListener {
             }
         });
 
-        confirmPwdShowHide = (AwesomeText) findViewById(R.id.signup_confirm_pwd_show_hide);
+    }
 
-        confirmPwdShowHide.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pwd_status) {
-                    etConfirmPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    pwd_status = false;
-                    confirmPwdShowHide.setMaterialDesignIcon(FontCharacterMaps.MaterialDesign.MD_VISIBILITY);
-                    etConfirmPassword.setSelection(etConfirmPassword.length());
-                } else {
-                    etConfirmPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
-                    pwd_status = true;
-                    confirmPwdShowHide.setMaterialDesignIcon(FontCharacterMaps.MaterialDesign.MD_VISIBILITY_OFF);
-                    etConfirmPassword.setSelection(etConfirmPassword.length());
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-                }
-            }
-        });
+        if (SharedPrefManager.getInstance(this).isLoggedIn()) {
+            Intent intent = new Intent(this, DepartmentActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -121,7 +115,6 @@ public class SignupActivity extends Activity implements View.OnClickListener {
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         if (username.isEmpty()) {
             etUsername.setError("Username is required");
@@ -146,13 +139,6 @@ public class SignupActivity extends Activity implements View.OnClickListener {
             return;
         }
 
-        if (!confirmPassword.equals(password)) {
-            etConfirmPassword.setError("The confirm password does not match password");
-            etConfirmPassword.requestFocus();
-            return;
-        }
-
-
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
@@ -173,7 +159,7 @@ public class SignupActivity extends Activity implements View.OnClickListener {
         jsonParams.put("email", email);
         jsonParams.put("storeId", sStore.getSelectedItem().toString());
 
-        RequestBody newUser = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),new JSONObject(jsonParams).toString());
+        RequestBody newUser = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
 
         Call<ResponseBody> call = RetrofitUser.getInstance().getUserApi().createUser(newUser);
@@ -188,6 +174,8 @@ public class SignupActivity extends Activity implements View.OnClickListener {
 
                 } else if (response.code() == 422) {
                     Toast.makeText(SignupActivity.this, "User already exist", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(SignupActivity.this, "The Service is down. Please try again later", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -198,6 +186,5 @@ public class SignupActivity extends Activity implements View.OnClickListener {
 
             }
         });
-        Toast.makeText(SignupActivity.this, "hello", Toast.LENGTH_LONG).show();
     }
 }

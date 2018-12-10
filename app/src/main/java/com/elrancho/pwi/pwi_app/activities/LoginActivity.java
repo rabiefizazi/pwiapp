@@ -3,17 +3,26 @@ package com.elrancho.pwi.pwi_app.activities;
 
 import android.app.Activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.ArrayMap;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.api.RetrofitUser;
+import com.elrancho.pwi.pwi_app.models.responses.User;
+import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -30,7 +39,7 @@ import retrofit2.Response;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText etUsername, etPassword;
     private AwesomeText passwordShowHide;
@@ -66,8 +75,23 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 }
             }
         });
+    }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(SharedPrefManager.getInstance(this).isLoggedIn()){
+            Intent intent = new Intent(this, DepartmentActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onBackPressed(){
+        finishAffinity();
     }
 
     @Override
@@ -123,11 +147,35 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.code() == 200) {
 
-                    ResponseBody dr = response.body();
-                    Toast.makeText(LoginActivity.this, "Success", Toast.LENGTH_LONG).show();
+                    String token = response.headers().get("Authorization");
+//                    token = token.replace("Bearer ", "");
+                    String userId = response.headers().get("userid");
+                    String username = response.headers().get("Username");
+                    String storeId = response.headers().get("storeId");
+                    User loggedUser = new User(token, userId, username, storeId);
 
-                } else if (response.code() == 422) {
-                    Toast.makeText(LoginActivity.this, "User already exist", Toast.LENGTH_LONG).show();
+                    SharedPrefManager.getInstance(LoginActivity.this).saveUser(loggedUser);
+
+                    Intent intent = new Intent(LoginActivity.this, DepartmentActivity.class);
+                    String t = SharedPrefManager.getInstance(LoginActivity.this).getUuser().getToken();
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+
+                } else if (response.code() == 401) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginActivity.this);
+                    alertDialogBuilder.setTitle("Login failed");
+                    alertDialogBuilder.setMessage("Your password and user ID do not match. Please try again or reset your password");
+                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
+                } else {
+                    Toast.makeText(LoginActivity.this, "The service is down. Please try again later", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -138,7 +186,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
             }
         });
-        Toast.makeText(LoginActivity.this, "hello", Toast.LENGTH_LONG).show();
     }
 }
 
