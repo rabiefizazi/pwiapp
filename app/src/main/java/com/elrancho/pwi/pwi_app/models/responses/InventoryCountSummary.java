@@ -9,6 +9,10 @@ public class InventoryCountSummary {
     private Double totalInventory;
 
     public InventoryCountSummary(Integer storeId, Integer departmentId, String weekEndDate, Double totalInventory) {
+        this.storeId = storeId;
+        this.departmentId = departmentId;
+        this.weekEndDate = weekEndDate;
+        this.totalInventory = totalInventory;
     }
 
     public Integer getStoreId() {
