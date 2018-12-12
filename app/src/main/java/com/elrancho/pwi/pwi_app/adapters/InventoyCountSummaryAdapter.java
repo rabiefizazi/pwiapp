@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.activities.InventoryCountDetailsActivity;
+import com.elrancho.pwi.pwi_app.activities.InventoryCountSummaryActivity;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;

@@ -6,6 +6,7 @@ public class InventoryCountDetails {
     private Integer departmentId;
     private String userId;
     private Integer vendorItem;
+    private String itemDescription;
     private Double cost;
     private Integer quantity;
     private String weekEndDate;
@@ -54,6 +55,14 @@ public class InventoryCountDetails {
 
     public void setVendorItem(Integer vendorItem) {
         this.vendorItem = vendorItem;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
     }
 
     public Double getCost() {

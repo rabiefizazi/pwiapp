@@ -8,8 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountSummaryAdapter;
@@ -18,7 +16,6 @@ import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummaryResponse;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
-import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -61,13 +58,7 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
                 inventoryCountSummaries = response.body().getInventoryCountSummaries();
                 inventoyCountSummaryAdapter = new InventoyCountSummaryAdapter(InventoryCountSummaryActivity.this, inventoryCountSummaries);
                 recyclerView.setAdapter(inventoyCountSummaryAdapter);
-
                 recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountSummaryActivity.this));
-
-                //Saving the inventoryCountSummaries in the SharedPref as a String using JSON
-                ArrayList<InventoryCountSummaryResponse> icsList = new ArrayList<>();
-                String icsString = new Gson().toJson(icsList);
-                //SharedPrefManagerInventorySummary.getInstance(InventoryCountSummaryActivity.this).saveInventoryCountSummary(icsString);
             }
 
             @Override

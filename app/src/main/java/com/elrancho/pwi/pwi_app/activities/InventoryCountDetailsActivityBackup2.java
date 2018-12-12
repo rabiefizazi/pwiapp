@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -21,20 +20,14 @@ import com.elrancho.pwi.pwi_app.adapters.InventoyCountDetailsAdapter;
 import com.elrancho.pwi.pwi_app.api.InventoryCountDetailsRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetailsResponse;
-
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
-
 import com.symbol.emdk.EMDKManager;
 import com.symbol.emdk.EMDKManager.EMDKListener;
-import com.symbol.emdk.EMDKResults;
 import com.symbol.emdk.barcode.BarcodeManager;
-import com.symbol.emdk.barcode.BarcodeManager.ScannerConnectionListener;
 import com.symbol.emdk.barcode.ScanDataCollection;
 import com.symbol.emdk.barcode.Scanner;
-import com.symbol.emdk.barcode.Scanner.DataListener;
-import com.symbol.emdk.barcode.Scanner.StatusListener;
 import com.symbol.emdk.barcode.ScannerConfig;
 import com.symbol.emdk.barcode.ScannerException;
 import com.symbol.emdk.barcode.ScannerInfo;
@@ -48,7 +41,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class InventoryCountDetailsActivity extends Activity implements EMDKListener, DataListener, StatusListener, ScannerConnectionListener {
+public class InventoryCountDetailsActivityBackup2 extends Activity implements EMDKListener, Scanner.DataListener, Scanner.StatusListener, BarcodeManager.ScannerConnectionListener {
 
     private RecyclerView recyclerView;
     private InventoyCountDetailsAdapter inventoyCountDetailsAdapter;
@@ -73,10 +66,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_details_recyclerview);
 
-
         retrofitCallInventoryCountDetails();
-
-        beginScanning();
     }
 
     public void retrofitCallInventoryCountDetails(){
@@ -97,9 +87,9 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
             public void onResponse(Call<InventoryCountDetailsResponse> call, Response<InventoryCountDetailsResponse> response) {
 
                 inventoryCounts = response.body().getInventoryCounts();
-                inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, inventoryCounts);
+                inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivityBackup2.this, inventoryCounts);
                 recyclerView.setAdapter(inventoyCountDetailsAdapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivity.this));
+                recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivityBackup2.this));
             }
 
             @Override
@@ -108,22 +98,6 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
             }
         });
     }
-
-    public void beginScanning(){
-        textViewData = findViewById(R.id.textViewData);
-        textViewStatus = findViewById(R.id.textViewStatus);
-
-
-        EMDKResults results = EMDKManager.getEMDKManager(getApplicationContext(), this);
-        if (results.statusCode != EMDKResults.STATUS_CODE.SUCCESS) {
-            textViewStatus.setText("Status: " + "EMDKManager object request failed!");
-            return;
-        }
-
-        textViewData.setSelected(true);
-        textViewData.setMovementMethod(new ScrollingMovementMethod());
-    }
-
 
     @Override
     public void onConnectionChange(ScannerInfo scannerInfo, BarcodeManager.ConnectionState connectionState) {
@@ -460,8 +434,6 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
         }
     }
 
-
-
     private class AsyncDataUpdate extends AsyncTask<String, Void, String> {
 
         @Override
@@ -489,7 +461,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
                 final EditText textViewData1 = (EditText) findViewById(R.id.textViewData1);
 
-                LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
+                LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivityBackup2.this);
                 final View quantityDialog = inflater.inflate(R.layout.activity_enter_quantity, null);
 
                 final EditText etQuantity = (EditText) quantityDialog.findViewById(R.id.etQuantity);
@@ -499,7 +471,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
                         etQuantity.post(new Runnable() {
                             @Override
                             public void run() {
-                                InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivityBackup2.this.getSystemService(Context.INPUT_METHOD_SERVICE);
                                 inputMethodManager.showSoftInput(etQuantity, InputMethodManager.SHOW_IMPLICIT);
                             }
                         });
@@ -508,7 +480,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
                 etQuantity.requestFocus();
 
-                AlertDialog dialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
+                AlertDialog dialog = new AlertDialog.Builder(InventoryCountDetailsActivityBackup2.this)
                         .setTitle("Enter Quantity")
                         .setView(quantityDialog)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
