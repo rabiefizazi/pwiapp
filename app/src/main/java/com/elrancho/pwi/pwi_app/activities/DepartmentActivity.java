@@ -1,32 +1,17 @@
 package com.elrancho.pwi.pwi_app.activities;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
-import com.elrancho.pwi.pwi_app.api.RetrofitInventoryCountSummary;
 import com.elrancho.pwi.pwi_app.models.responses.Department;
-import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummaryResponse;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
-import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
-import java.util.Map;
-
-import retrofit2.Call;
 
 public class DepartmentActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -59,9 +44,9 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_settings) {
             SharedPrefManager.getInstance(this).clear();
-            finish();
+            //finish();
             Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
 
             return true;
@@ -114,7 +99,7 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
         SharedPrefManagerDepartment.getInstance(this).saveDepartment(department);
 
         Intent intent = new Intent(DepartmentActivity.this, InventoryCountSummaryActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

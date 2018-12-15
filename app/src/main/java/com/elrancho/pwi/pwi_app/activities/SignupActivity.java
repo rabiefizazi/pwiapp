@@ -1,23 +1,19 @@
 package com.elrancho.pwi.pwi_app.activities;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.ArrayMap;
 import android.util.Patterns;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
-import com.elrancho.pwi.pwi_app.api.RetrofitUser;
+import com.elrancho.pwi.pwi_app.api.UserRetrofit;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 
 import org.json.JSONObject;
@@ -162,7 +158,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         RequestBody newUser = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
 
-        Call<ResponseBody> call = RetrofitUser.getInstance().getUserApi().createUser(newUser);
+        Call<ResponseBody> call = UserRetrofit.getInstance().getUserApi().createUser(newUser);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override

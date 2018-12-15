@@ -11,9 +11,9 @@ public interface InventoryCountSummaryApi {
 
 @GET("totalInventory/{storeId}/{departmentId}")
     Call<InventoryCountSummaryResponse> getInventoryCountSummary(
-            @Header("Authorization") String token,
-            @Path("storeId") String storeId,
-            @Path("departmentId") String departmentId
+        @Header("Authorization") String token,
+        @Path("storeId") String storeId,
+        @Path("departmentId") String departmentId
 );
 
 }

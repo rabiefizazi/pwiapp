@@ -5,13 +5,13 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitInventoryCountSummary {
+public class ItemRetrofit {
 
-    private static final String BASE_URL = "http://ec2-52-72-212-233.compute-1.amazonaws.com:8080/pwi-app-ws/inventorycounts/";
-    private static RetrofitInventoryCountSummary mInstance;
+    private static final String BASE_URL = "http://ec2-52-72-212-233.compute-1.amazonaws.com:8080/pwi-app-ws/items/";
+    private static ItemRetrofit mInstance;
     private Retrofit retrofit;
 
-    private RetrofitInventoryCountSummary(){
+    private ItemRetrofit(){
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -26,14 +26,16 @@ public class RetrofitInventoryCountSummary {
                 .build();
     }
 
-    public static synchronized RetrofitInventoryCountSummary getInstance(){
+    public static synchronized ItemRetrofit getInstance(){
         if(mInstance==null)
-            mInstance = new RetrofitInventoryCountSummary();
+            mInstance = new ItemRetrofit();
         return mInstance;
     }
 
-    public InventoryCountSummaryApi getInventoryCountSummaryApi(){
-        return retrofit.create(InventoryCountSummaryApi.class);
+    public ItemApi getItemApi(){
+        return retrofit.create(ItemApi.class);
     }
+
+
 
 }

@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.activities.InventoryCountDetailsActivity;
-import com.elrancho.pwi.pwi_app.activities.InventoryCountSummaryActivity;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
@@ -65,7 +64,7 @@ public class InventoyCountSummaryAdapter extends RecyclerView.Adapter<InventoyCo
                 SharedPrefManagerInventorySummary.getInstance(mContext).saveInventoryCountSummary(inventoryCountSummary);
 
                 Intent intent = new Intent(mContext, InventoryCountDetailsActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 mContext.startActivity(intent);
             }
         });

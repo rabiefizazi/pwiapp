@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.v7.widget.CardView
+        <android.support.v7.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/inventory_summary_count_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -19,80 +20,80 @@
             android:layout_margin="1dp"
             android:clickable="true"
             android:foreground="?android:attr/selectableItemBackground"
-            android:background="@color/md_orange_50">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:gravity="top"
-                android:text="description/"
-                android:textSize="18dp" />
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="1dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="22dp"
-                android:gravity="bottom"
-                android:text="Vendor Item"
-                android:textAlignment="textEnd"
-                android:textSize="18dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:gravity="top"
+                    android:text="description/"
+                    android:textSize="18dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="128dp"
-                android:layout_marginTop="22dp"
-                android:gravity="center"
-                android:text="Cost"
-                android:textAlignment="textEnd"
-                android:textSize="18dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="22dp"
+                    android:gravity="bottom"
+                    android:text="Vendor Item"
+                    android:textAlignment="textEnd"
+                    android:textSize="18dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="238dp"
-                android:layout_marginTop="22dp"
-                android:gravity="center"
-                android:text="Unit"
-                android:textAlignment="textEnd"
-                android:textSize="18dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="128dp"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center"
+                    android:text="Cost"
+                    android:textAlignment="textEnd"
+                    android:textSize="18dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="190dp"
-                android:layout_marginTop="22dp"
-                android:gravity="center"
-                android:text="Qty"
-                android:textAlignment="textEnd"
-                android:textSize="18dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="238dp"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center"
+                    android:text="Unit"
+                    android:textAlignment="textEnd"
+                    android:textSize="18dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="304dp"
-                android:layout_marginTop="22dp"
-                android:gravity="center"
-                android:text="Master?"
-                android:textAlignment="textEnd"
-                android:textSize="18dp" />
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="190dp"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center"
+                    android:text="Qty"
+                    android:textAlignment="textEnd"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="288dp"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center"
+                    android:text="Master?"
+                    android:textAlignment="textEnd"
+                    android:textSize="18dp" />
+            </RelativeLayout>
         </android.support.v7.widget.CardView>
         <ScrollView
             android:id="@+id/scrollView1"
@@ -117,6 +118,14 @@
 
                 <EditText
                     android:id="@+id/textViewData1"
+                    android:layout_width="242dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:maxLines="100"
+                    android:scrollbars="vertical"
+                    android:scrollHorizontally="false" />
+                <EditText
+                    android:id="@+id/textViewData2"
                     android:layout_width="242dp"
                     android:layout_height="wrap_content"
                     android:gravity="bottom"
@@ -151,4 +160,4 @@
 
     </LinearLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

@@ -1,28 +1,22 @@
 package com.elrancho.pwi.pwi_app.activities;
 
 
-import android.app.Activity;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.ArrayMap;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
-import com.elrancho.pwi.pwi_app.api.RetrofitUser;
+import com.elrancho.pwi.pwi_app.api.UserRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.User;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -140,7 +134,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         RequestBody userLogin = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
-        Call<ResponseBody> call = RetrofitUser.getInstance().getUserApi().userLogin(userLogin);
+        Call<ResponseBody> call = UserRetrofit.getInstance().getUserApi().userLogin(userLogin);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override

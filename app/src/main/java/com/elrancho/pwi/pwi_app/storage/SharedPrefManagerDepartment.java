@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.elrancho.pwi.pwi_app.models.responses.Department;
-import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 
 public class SharedPrefManagerDepartment {
 

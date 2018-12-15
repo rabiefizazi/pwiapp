@@ -1,9 +1,11 @@
 package com.elrancho.pwi.pwi_app.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,13 +21,15 @@ import android.widget.TextView;
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountDetailsAdapter;
 import com.elrancho.pwi.pwi_app.api.InventoryCountDetailsRetrofit;
+import com.elrancho.pwi.pwi_app.api.ItemRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetailsResponse;
-
+import com.elrancho.pwi.pwi_app.models.responses.Item;
+import com.elrancho.pwi.pwi_app.models.responses.ItemResponse;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
-
+import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerItem;
 import com.symbol.emdk.EMDKManager;
 import com.symbol.emdk.EMDKManager.EMDKListener;
 import com.symbol.emdk.EMDKResults;
@@ -50,9 +54,13 @@ import retrofit2.Response;
 
 public class InventoryCountDetailsActivity extends Activity implements EMDKListener, DataListener, StatusListener, ScannerConnectionListener {
 
+    //vars for the InventoryCountDetails Retrofit call
     private RecyclerView recyclerView;
     private InventoyCountDetailsAdapter inventoyCountDetailsAdapter;
     private List<InventoryCountDetails> inventoryCounts;
+
+    //vars for item retrofit call
+    private List<Item> items;
 
     private EMDKManager emdkManager = null;
     private BarcodeManager barcodeManager = null;
@@ -61,6 +69,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
     private TextView textViewData = null;
     private TextView textViewStatus = null;
 
+    private TextView t2;
     private List<ScannerInfo> deviceList = null;
 
     private int scannerIndex = 0; // Keep the selected scanner
@@ -68,18 +77,23 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
     private int dataLength = 0;
     private String statusString = "";
 
+    //Item information
+    String itemDescription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_details_recyclerview);
 
+        ActionBar actionBar = getActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.Sienna)));
 
         retrofitCallInventoryCountDetails();
 
         beginScanning();
     }
 
-    public void retrofitCallInventoryCountDetails(){
+    public void retrofitCallInventoryCountDetails() {
 
         String token = SharedPrefManager.getInstance(this).getUuser().getToken();
         String storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
@@ -109,7 +123,115 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
         });
     }
 
-    public void beginScanning(){
+    //Item Retrofit Call
+    public void retrofitCallItemDetails(String vendorItem) {
+
+        String token = SharedPrefManager.getInstance(this).getUuser().getToken();
+        String storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
+
+        recyclerView = findViewById(R.id.inventory_details_count_recyclerview);
+
+        t2 = findViewById(R.id.textViewData2);
+
+        Call<ItemResponse> call = ItemRetrofit.getInstance().getItemApi().getItem(token, storeId, vendorItem);
+
+
+        call.enqueue(new Callback<ItemResponse>() {
+            @Override
+            public void onResponse(Call<ItemResponse> call, Response<ItemResponse> response) {
+
+                Integer storeId = response.body().getItems().get(0).getStoreId();
+                String itemDescription = response.body().getItems().get(0).getDescription();
+                Integer itemUpc = response.body().getItems().get(0).getItemUPC();
+                Integer vendorItem = response.body().getItems().get(0).getVendorItem();
+                Double itemCost = response.body().getItems().get(0).getCost();
+                String unitOfMeasure = response.body().getItems().get(0).getUnitOfMeasure();
+                boolean itemMaster = response.body().getItems().get(0).getItemMaster();
+
+                //t2.setText(items.get(0).getDescription());
+
+                Item item = new Item(itemUpc, vendorItem, storeId, itemDescription, "", itemCost, unitOfMeasure, itemMaster, "");
+
+                SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).clear();
+                SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).saveItem(item);
+
+                //populating the fields in the quantity dialog box
+                if (vendorItem != null) {
+                    if (dataLength++ > 100) { //Clear the cache after 100 scans
+                        textViewData.setText("");
+                        dataLength = 0;
+                    }
+
+                    textViewData.append(vendorItem + "\n");
+
+
+                    ((View) findViewById(R.id.scrollView1)).post(new Runnable() {
+                        public void run() {
+                            ((ScrollView) findViewById(R.id.scrollView1)).fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
+
+                    final EditText textViewData1 = (EditText) findViewById(R.id.textViewData1);
+
+                    LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
+                    final View quantityDialog = inflater.inflate(R.layout.activity_enter_quantity, null);
+
+                    final EditText etQuantity = (EditText) quantityDialog.findViewById(R.id.etQuantity);
+
+                    final TextView etItemDescription = quantityDialog.findViewById(R.id.item_description);
+                    final TextView etVendorItem = quantityDialog.findViewById(R.id.vendorItem);
+                    final TextView etItemCost = quantityDialog.findViewById(R.id.item_cost);
+                    final TextView etUnitOfMeasure = quantityDialog.findViewById(R.id.unit_of_measure);
+
+                    if (SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getDescription() != null) {
+                        etItemDescription.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getDescription());
+                        etVendorItem.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getVendorItem().toString());
+                        etItemCost.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getCost().toString());
+                        etUnitOfMeasure.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getUnitOfMeasure());
+                    } else
+                        etItemDescription.setText("failed");
+                    //******************Testing code end****************//
+
+                    etQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                        @Override
+                        public void onFocusChange(View v, boolean hasFocus) {
+                            etQuantity.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    inputMethodManager.showSoftInput(etQuantity, InputMethodManager.SHOW_IMPLICIT);
+                                }
+                            });
+                        }
+                    });
+
+                    etQuantity.requestFocus();
+
+                    AlertDialog dialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
+                            .setTitle("Enter Quantity")
+                            .setView(quantityDialog)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                    textViewData1.setText(etQuantity.getText());
+                                }
+                            })
+                            .setNegativeButton("Cancel", null).create();
+
+                    dialog.show();
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ItemResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void beginScanning() {
         textViewData = findViewById(R.id.textViewData);
         textViewStatus = findViewById(R.id.textViewStatus);
 
@@ -231,6 +353,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
         // Add connection listener
         if (barcodeManager != null) {
+            deviceList = barcodeManager.getSupportedDevicesInfo();
             barcodeManager.addConnectionListener(this);
         }
 
@@ -287,6 +410,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
             // Add connection listener
             if (barcodeManager != null) {
+                deviceList = barcodeManager.getSupportedDevicesInfo();
                 barcodeManager.addConnectionListener(this);
             }
 
@@ -298,7 +422,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
 
         // De-initialize scanner
@@ -381,6 +505,10 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
             try {
 
                 if (scanner.isEnabled()) {
+                    ScannerConfig config = scanner.getConfig();
+                    //Set MSI
+                    config.decoderParams.msi.enabled = true;
+                    scanner.setConfig(config);
                     // Submit a new read.
                     scanner.read();
 
@@ -400,7 +528,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
         if (scanner == null) {
 
-            deviceList = barcodeManager.getSupportedDevicesInfo();
+            //deviceList = barcodeManager.getSupportedDevicesInfo();
 
             if ((deviceList != null) && (deviceList.size() != 0)) {
                 scanner = barcodeManager.getDevice(BarcodeManager.DeviceIdentifier.DEFAULT);
@@ -461,7 +589,6 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
     }
 
 
-
     private class AsyncDataUpdate extends AsyncTask<String, Void, String> {
 
         @Override
@@ -472,56 +599,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
         protected void onPostExecute(String result) {
 
-            if (result != null) {
-                if (dataLength++ > 100) { //Clear the cache after 100 scans
-                    textViewData.setText("");
-                    dataLength = 0;
-                }
-
-                textViewData.append(result + "\n");
-
-
-                ((View) findViewById(R.id.scrollView1)).post(new Runnable() {
-                    public void run() {
-                        ((ScrollView) findViewById(R.id.scrollView1)).fullScroll(View.FOCUS_DOWN);
-                    }
-                });
-
-                final EditText textViewData1 = (EditText) findViewById(R.id.textViewData1);
-
-                LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
-                final View quantityDialog = inflater.inflate(R.layout.activity_enter_quantity, null);
-
-                final EditText etQuantity = (EditText) quantityDialog.findViewById(R.id.etQuantity);
-                etQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus) {
-                        etQuantity.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                inputMethodManager.showSoftInput(etQuantity, InputMethodManager.SHOW_IMPLICIT);
-                            }
-                        });
-                    }
-                });
-
-                etQuantity.requestFocus();
-
-                AlertDialog dialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
-                        .setTitle("Enter Quantity")
-                        .setView(quantityDialog)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-
-                                textViewData1.setText(etQuantity.getText());
-                            }
-                        })
-                        .setNegativeButton("Cancel", null).create();
-
-                dialog.show();
-
-            }
+            retrofitCallItemDetails(result);
         }
     }
 

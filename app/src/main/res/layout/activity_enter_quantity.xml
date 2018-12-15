@@ -61,7 +61,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/a2"
+            android:id="@+id/vendorItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -70,20 +70,20 @@
             android:textSize="18dp" />
 
         <TextView
-            android:id="@+id/b2"
+            android:id="@+id/item_description"
             android:layout_width="200dp"
             android:layout_height="30dp"
-            android:layout_alignEnd="@+id/a2"
+            android:layout_alignEnd="@+id/vendorItem"
             android:layout_alignParentTop="true"
             android:layout_marginTop="51dp"
             android:layout_marginEnd="-110dp"
             android:text="Meat item number 123.1"
             android:textSize="18dp" />
         <TextView
-            android:id="@+id/c2"
+            android:id="@+id/item_cost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/a2"
+            android:layout_below="@+id/vendorItem"
             android:layout_alignParentStart="true"
             android:layout_marginTop="49dp"
             android:text="$ 5.99"
@@ -91,7 +91,7 @@
 
 
         <TextView
-            android:id="@+id/d2"
+            android:id="@+id/unit_of_measure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -101,27 +101,31 @@
             android:textSize="18dp" />
     </RelativeLayout>
 </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:gravity="center"
-        android:layout_marginTop="65dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="45dp"
-        android:layout_marginRight="45dp">
+        android:layout_marginTop="65dp"
+        android:layout_marginRight="45dp"
+        android:gravity="center">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
             android:text="Enter quantity"
-            android:textSize="18dp"
-            android:layout_marginRight="15dp"/>
+            android:textSize="18dp" />
+
         <AutoCompleteTextView
             android:id="@+id/etQuantity"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="75dp"
+            android:layout_height="80dp"
             android:background="@drawable/edittext_background"
-            android:textSize="21dp"
             android:ems="5"
+            android:inputType="numberDecimal"
             android:maxLines="1"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:textSize="48dp" />
     </LinearLayout>
 </LinearLayout>

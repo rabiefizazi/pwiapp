@@ -1,7 +1,6 @@
 package com.elrancho.pwi.pwi_app.api;
 
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetailsResponse;
-import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummaryResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -17,4 +16,6 @@ public interface InventoryCountDetailsApi {
             @Path("departmentId") String departmentId,
             @Path("weekEndDate") String weekEndDate
     );
+
+
 }

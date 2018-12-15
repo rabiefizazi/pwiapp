@@ -1,4 +1,4 @@
-//package com.elrancho.pwi.pwi_app.fragments;
+package com.elrancho.pwi.pwi_app.fragments;//package com.elrancho.pwi.pwi_app.fragments;
 //
 //import android.content.Intent;
 //import android.os.Bundle;

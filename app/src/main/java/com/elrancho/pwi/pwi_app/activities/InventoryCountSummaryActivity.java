@@ -16,9 +16,7 @@ import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummaryResponse;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
-import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -78,7 +76,7 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_settings) {
             SharedPrefManager.getInstance(this).clear();
-            finish();
+            //finish();
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
