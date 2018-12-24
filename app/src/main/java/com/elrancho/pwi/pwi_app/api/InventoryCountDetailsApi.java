@@ -18,4 +18,13 @@ public interface InventoryCountDetailsApi {
     );
 
 
+    @GET("{storeId}/{departmentId}/{vendorItem}/{weekEndDate}")
+    Call<InventoryCountDetailsResponse> getInventoryCountDetail(
+            @Header("Authorization") String token,
+            @Path("storeId") String storeId,
+            @Path("departmentId") String departmentId,
+            @Path("vendorItem") String vendorItem,
+            @Path("weekEndDate") String weekEndDate
+    );
+
 }

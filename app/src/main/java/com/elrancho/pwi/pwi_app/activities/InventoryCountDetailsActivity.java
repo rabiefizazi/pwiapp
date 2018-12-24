@@ -46,6 +46,7 @@ import com.symbol.emdk.barcode.ScannerResults;
 import com.symbol.emdk.barcode.StatusData;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -188,6 +189,15 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
                         etVendorItem.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getVendorItem().toString());
                         etItemCost.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getCost().toString());
                         etUnitOfMeasure.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getUnitOfMeasure());
+
+                        //populate etQuantity with the actual quantity if the item already exist in the InventoryCount table
+
+                        Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
+                        for(InventoryCountDetails icd:inventoryCountDetailsIterator){
+                            if(icd.getVendorItem()==vendorItem)
+                                etQuantity.setText(icd.getQuantity().toString());
+                            else etQuantity.setText("99");
+                        }
                     } else
                         etItemDescription.setText("failed");
                     //******************Testing code end****************//
