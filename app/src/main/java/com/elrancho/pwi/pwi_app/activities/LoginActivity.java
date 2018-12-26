@@ -1,15 +1,23 @@
 package com.elrancho.pwi.pwi_app.activities;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.ArrayMap;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
@@ -31,13 +39,15 @@ import retrofit2.Response;
 
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText etUsername, etPassword;
     private AwesomeText passwordShowHide;
 
+    private View vloginFrom;
+    private View vProgressBar;
     private boolean pwd_status = true;
 
     @Override
@@ -46,7 +56,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
 
         etUsername = findViewById(R.id.username);
+        etUsername.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                etPassword.requestFocus();
+                return false;
+            }
+        });
+
         etPassword = findViewById(R.id.password);
+        etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                attemptLogin();
+                return false;
+            }
+        });
+
+        vloginFrom = findViewById(R.id.login_form);
+        vProgressBar = findViewById(R.id.login_progress);
 
         findViewById(R.id.btn_Sign_in).setOnClickListener(this);
         findViewById(R.id.register).setOnClickListener(this);
@@ -71,12 +99,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
 
-        if(SharedPrefManager.getInstance(this).isLoggedIn()){
+        if (SharedPrefManager.getInstance(this).isLoggedIn()) {
             Intent intent = new Intent(this, DepartmentActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -84,7 +111,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         finishAffinity();
     }
 
@@ -93,14 +120,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         switch (v.getId()) {
             case R.id.btn_Sign_in:
-                userLogin();
+                attemptLogin();
                 break;
             case R.id.register:
                 startActivity(new Intent(this, SignupActivity.class));
         }
     }
 
-    public void userLogin() {
+    public void attemptLogin() {
 
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
@@ -132,17 +159,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         jsonParams.put("username", username);
         jsonParams.put("password", password);
 
+
         RequestBody userLogin = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
         Call<ResponseBody> call = UserRetrofit.getInstance().getUserApi().userLogin(userLogin);
 
+        showProgress(true);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.code() == 200) {
-
+                    showProgress(false);
                     String token = response.headers().get("Authorization");
-//                    token = token.replace("Bearer ", "");
                     String userId = response.headers().get("userid");
                     String username = response.headers().get("Username");
                     String storeId = response.headers().get("storeId");
@@ -156,6 +184,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     startActivity(intent);
 
                 } else if (response.code() == 401) {
+                    showProgress(false);
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginActivity.this);
                     alertDialogBuilder.setTitle("Login failed");
                     alertDialogBuilder.setMessage("Your password and user ID do not match. Please try again or reset your password");
@@ -169,6 +198,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     alertDialog.show();
 
                 } else {
+                    showProgress(false);
                     Toast.makeText(LoginActivity.this, "The service is down. Please try again later", Toast.LENGTH_LONG).show();
                 }
             }
@@ -177,9 +207,43 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
                 Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                showProgress(false);
 
             }
         });
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            vloginFrom.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+            vloginFrom.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    vloginFrom.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+                }
+            });
+
+            vProgressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+            vProgressBar.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    vProgressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            vProgressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+            vloginFrom.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+        }
     }
 }
 

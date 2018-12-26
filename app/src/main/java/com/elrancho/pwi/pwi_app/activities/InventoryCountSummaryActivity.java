@@ -11,7 +11,7 @@ import android.view.MenuItem;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountSummaryAdapter;
-import com.elrancho.pwi.pwi_app.api.RetrofitInventoryCountSummary;
+import com.elrancho.pwi.pwi_app.api.InventoryCountSummaryRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummaryResponse;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
@@ -46,7 +46,7 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
 
         recyclerView = findViewById(R.id.inventory_summary_count_recyclerview);
 
-        Call<InventoryCountSummaryResponse> call = RetrofitInventoryCountSummary
+        Call<InventoryCountSummaryResponse> call = InventoryCountSummaryRetrofit
                 .getInstance().getInventoryCountSummaryApi().getInventoryCountSummary(token, storeId, departmentId);
 
         call.enqueue(new Callback<InventoryCountSummaryResponse>() {

@@ -11,17 +11,20 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountDetailsAdapter;
 import com.elrancho.pwi.pwi_app.api.InventoryCountDetailsRetrofit;
 import com.elrancho.pwi.pwi_app.api.ItemRetrofit;
+import com.elrancho.pwi.pwi_app.api.UserRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetailsResponse;
 import com.elrancho.pwi.pwi_app.models.responses.Item;
@@ -45,10 +48,15 @@ import com.symbol.emdk.barcode.ScannerInfo;
 import com.symbol.emdk.barcode.ScannerResults;
 import com.symbol.emdk.barcode.StatusData;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -77,9 +85,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
     private int dataLength = 0;
     private String statusString = "";
-
-    //Item information
-    String itemDescription;
+    private boolean isInventoryCountExist = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +150,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
                 Integer storeId = response.body().getItems().get(0).getStoreId();
                 String itemDescription = response.body().getItems().get(0).getDescription();
                 Integer itemUpc = response.body().getItems().get(0).getItemUPC();
-                Integer vendorItem = response.body().getItems().get(0).getVendorItem();
+                final Integer vendorItem = response.body().getItems().get(0).getVendorItem();
                 Double itemCost = response.body().getItems().get(0).getCost();
                 String unitOfMeasure = response.body().getItems().get(0).getUnitOfMeasure();
                 boolean itemMaster = response.body().getItems().get(0).getItemMaster();
@@ -193,10 +199,11 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
                         //populate etQuantity with the actual quantity if the item already exist in the InventoryCount table
 
                         Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
-                        for(InventoryCountDetails icd:inventoryCountDetailsIterator){
-                            if(icd.getVendorItem()==vendorItem)
+                        for (InventoryCountDetails icd : inventoryCountDetailsIterator) {
+                            if ((icd.getVendorItem() - vendorItem) == 0) {
                                 etQuantity.setText(icd.getQuantity().toString());
-                            else etQuantity.setText("99");
+                                isInventoryCountExist = true;
+                            } else etQuantity.setText("0");
                         }
                     } else
                         etItemDescription.setText("failed");
@@ -223,6 +230,55 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
 
+                                    //************************************************************************************************************************
+                                    // Build the Json Request
+
+
+                                    Map<String, String> jsonParams = new ArrayMap<>();
+                                    jsonParams.put("storeId", SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getStoreId());
+                                    jsonParams.put("departmentId", SharedPrefManagerDepartment.getInstance(InventoryCountDetailsActivity.this).getDepartment().getDepartmentId());
+                                    jsonParams.put("userId", SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getUserid());
+                                    jsonParams.put("vendorItem", etVendorItem.getText().toString());
+                                    jsonParams.put("itemDescription", etItemDescription.getText().toString());
+                                    jsonParams.put("cost", etItemCost.getText().toString());
+                                    jsonParams.put("quantity", etQuantity.getText().toString());
+                                    jsonParams.put("itemMaster", "true");
+
+                                    RequestBody newInventoryCount = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
+
+                                    Call<ResponseBody> call;
+                                    if (isInventoryCountExist == false)
+                                        call = InventoryCountDetailsRetrofit.getInstance()
+                                                .getInventoryCountDetailsApi().createInventoryCountDetail(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser()
+                                                        .getToken(), newInventoryCount);
+                                    else
+                                        call = InventoryCountDetailsRetrofit.getInstance()
+                                                .getInventoryCountDetailsApi().updateInventoryCountDetail(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser()
+                                                        .getToken(), newInventoryCount);
+
+                                    call.enqueue(new Callback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                            if (response.code() == 201) {
+
+                                                ResponseBody dr = response.body();
+                                                Toast.makeText(InventoryCountDetailsActivity.this, "Success", Toast.LENGTH_LONG).show();
+
+                                            } else if (response.code() == 422) {
+                                                Toast.makeText(InventoryCountDetailsActivity.this, "User already exist", Toast.LENGTH_LONG).show();
+                                            } else {
+                                                Toast.makeText(InventoryCountDetailsActivity.this, "The Service is down. Please try again later", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                            Toast.makeText(InventoryCountDetailsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+
+                                        }
+                                    });
+                                    //************************************************************************************************************************
                                     textViewData1.setText(etQuantity.getText());
                                 }
                             })
