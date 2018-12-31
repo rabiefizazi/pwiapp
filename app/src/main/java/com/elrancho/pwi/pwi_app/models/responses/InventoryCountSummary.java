@@ -7,12 +7,14 @@ public class InventoryCountSummary {
     private Integer departmentId;
     private String weekEndDate;
     private Double totalInventory;
+    private int position;
 
-    public InventoryCountSummary(Integer storeId, Integer departmentId, String weekEndDate, Double totalInventory) {
+    public InventoryCountSummary(Integer storeId, Integer departmentId, String weekEndDate, Double totalInventory, int position) {
         this.storeId = storeId;
         this.departmentId = departmentId;
         this.weekEndDate = weekEndDate;
         this.totalInventory = totalInventory;
+        this.position = position;
     }
 
     public Integer getStoreId() {
@@ -47,4 +49,11 @@ public class InventoryCountSummary {
         this.totalInventory = totalInventory;
     }
 
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 }

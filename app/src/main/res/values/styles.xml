@@ -1,23 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!--:::::::::::::::::::::::::::::::::::::::::::::Base application theme::::::::::::::::::::::::::::::::::::::::::::-->
+    <style name="AppTheme" parent="@style/Theme.AppCompat">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/Sienna</item>
+        <item name="colorPrimary">@color/SaddleBrown</item>
         <item name="colorPrimaryDark">@color/SaddleBrown</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/SaddleBrown</item>
+        <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
+        <item name="android:icon">@drawable/elranchologo_24x24</item>
+        <item name="icon">@drawable/elranchologo_24x24</item>
     </style>
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="AppTheme.ActionBar" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:displayOptions">showHome|showTitle</item>
+        <item name="displayOptions">showHome|showTitle</item>
+        <item name="titleTextStyle">@style/AppTheme.ActionBar.ActionBarTitleText</item>
+        <item name="background">@color/SaddleBrown</item>
     </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="ScanningTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme.ActionBar.ActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/White</item>
+        <!-- The textColor property is backward compatible with the Support Library -->
+    </style>
+    <!--:::::::::::::::::::::::::::::::::::::::::::::Login/SignUp theme::::::::::::::::::::::::::::::::::::::::::::-->
+    <style name="LoginTheme" parent="@style/Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
     </style>
 

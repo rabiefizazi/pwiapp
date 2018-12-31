@@ -1,19 +1,29 @@
 package com.elrancho.pwi.pwi_app.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.ArrayMap;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.api.UserRetrofit;
+import com.elrancho.pwi.pwi_app.shared.ProgressBarVisibility;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 
 import org.json.JSONObject;
@@ -33,6 +43,11 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private EditText etUsername, etPassword, etEmail;
     private Spinner sStore;
 
+    private View vSignupForm;
+    private View vProgressBar;
+
+    private ProgressBarVisibility progressBarVisibility;
+
     private boolean pwd_status = true;
 
     private AwesomeText pwdShowHide;
@@ -42,10 +57,49 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        etUsername = findViewById(R.id.username);
-        etPassword = findViewById(R.id.password);
-        etEmail = findViewById(R.id.email);
+        vSignupForm = findViewById(R.id.signup_form);
+        vProgressBar = findViewById(R.id.signup_progress);
+
         sStore = findViewById(R.id.store);
+        sStore.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ((TextView)parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.Moccasin));
+                etEmail.requestFocus();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        etEmail = findViewById(R.id.email);
+        etEmail.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                etUsername.requestFocus();
+                return false;
+            }
+        });
+
+        etUsername = findViewById(R.id.username);
+        etUsername.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                etPassword.requestFocus();
+                return false;
+            }
+        });
+
+        etPassword = findViewById(R.id.password);
+        etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                userSignUp();
+                return false;
+            }
+        });
 
         pwdShowHide = findViewById(R.id.signup_pwd_show_hide);
 
@@ -141,6 +195,12 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             return;
         }
 
+        if (!email.contains("@elranchoinc.com")) {
+            etEmail.setError("Not El Rancho email");
+            etEmail.requestFocus();
+            return;
+        }
+
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmail.setError("Invalid email");
             etEmail.requestFocus();
@@ -160,25 +220,52 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
         Call<ResponseBody> call = UserRetrofit.getInstance().getUserApi().createUser(newUser);
 
+        progressBarVisibility = new ProgressBarVisibility(this, vSignupForm, vProgressBar);
+        progressBarVisibility.showProgress(true);
+
         call.enqueue(new Callback<ResponseBody>() {
+
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.code() == 201) {
 
-                    ResponseBody dr = response.body();
-                    Toast.makeText(SignupActivity.this, "Success", Toast.LENGTH_LONG).show();
+                progressBarVisibility.showProgress(false);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignupActivity.this);
+                if (response.code() == 201) {
+                    alertDialogBuilder.setTitle("Check your email");
+                    alertDialogBuilder.setMessage("Account has been create successfully! We've sent a verification link to "+etEmail.getText().toString()+".");
+                    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            startActivity(new Intent(SignupActivity.this, LoginActivity.class));
+                        }
+                    });
 
                 } else if (response.code() == 422) {
-                    Toast.makeText(SignupActivity.this, "User already exist", Toast.LENGTH_LONG).show();
+
+                    alertDialogBuilder.setTitle("Account already exist");
+                    alertDialogBuilder.setMessage("Account " + etUsername.getText().toString()+" already exist.");
                 } else {
-                    Toast.makeText(SignupActivity.this, "The Service is down. Please try again later", Toast.LENGTH_LONG).show();
+                    alertDialogBuilder.setTitle("The Service is down");
+                    alertDialogBuilder.setMessage("The Service is down. Please try again later");
                 }
+
+                alertDialogBuilder.setPositiveButton("OK", null);
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                Toast.makeText(SignupActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                progressBarVisibility.showProgress(false);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignupActivity.this);
+                alertDialogBuilder.setTitle("The Service is down");
+                alertDialogBuilder.setMessage("The Service is down. Please try again later");
+                alertDialogBuilder.setPositiveButton("OK", null);
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
 
             }
         });

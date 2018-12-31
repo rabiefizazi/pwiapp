@@ -32,6 +32,7 @@ public class SharedPrefManagerInventorySummary {
         editor.putInt("departmentId", inventoryCountSummary.getDepartmentId());
         editor.putString("weekEndDate", inventoryCountSummary.getWeekEndDate());
         editor.putLong("totalInventory", Double.doubleToRawLongBits(inventoryCountSummary.getTotalInventory()));
+        editor.putInt("position", inventoryCountSummary.getPosition());
 
         editor.apply();
 
@@ -44,7 +45,8 @@ public class SharedPrefManagerInventorySummary {
                 sharedPreferences.getInt("storeId", -1),
                 sharedPreferences.getInt("departmentId", -1),
                 sharedPreferences.getString("weekEndDate", null),
-                Double.longBitsToDouble(sharedPreferences.getLong("totalInventory", -1))
+                Double.longBitsToDouble(sharedPreferences.getLong("totalInventory", -1)),
+                sharedPreferences.getInt("position", -1)
         );
     }
 

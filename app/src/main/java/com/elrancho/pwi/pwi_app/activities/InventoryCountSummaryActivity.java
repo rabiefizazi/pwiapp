@@ -8,15 +8,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountSummaryAdapter;
 import com.elrancho.pwi.pwi_app.api.InventoryCountSummaryRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummaryResponse;
+import com.elrancho.pwi.pwi_app.shared.ProgressBarVisibility;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -30,10 +34,18 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
     private InventoyCountSummaryAdapter inventoyCountSummaryAdapter;
     private List<InventoryCountSummary> inventoryCountSummaries;
 
+    private ProgressBarVisibility progressBarVisibility;
+
+    private View vInventoryCountSummaryForm;
+    private View vProgressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_summary_recyclerview);
+
+        vInventoryCountSummaryForm = findViewById(R.id.content_layout);
+        vProgressBar = findViewById(R.id.inventory_count_summary_progress);
 
         retrofitCallInventoryCountSummary();
     }
@@ -44,16 +56,27 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
         String storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
         String departmentId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getDepartmentId();
 
-        recyclerView = findViewById(R.id.inventory_summary_count_recyclerview);
+        recyclerView = findViewById(R.id.inventory_count_summary_recyclerview);
 
         Call<InventoryCountSummaryResponse> call = InventoryCountSummaryRetrofit
                 .getInstance().getInventoryCountSummaryApi().getInventoryCountSummary(token, storeId, departmentId);
 
+        progressBarVisibility = new ProgressBarVisibility(this, vInventoryCountSummaryForm, vProgressBar);
+        progressBarVisibility.showProgress(true);
+
         call.enqueue(new Callback<InventoryCountSummaryResponse>() {
             @Override
             public void onResponse(Call<InventoryCountSummaryResponse> call, Response<InventoryCountSummaryResponse> response) {
+                progressBarVisibility.showProgress(false);
 
                 inventoryCountSummaries = response.body().getInventoryCountSummaries();
+                Collections.sort(inventoryCountSummaries, new Comparator<InventoryCountSummary>() {
+                    @Override
+                    public int compare(InventoryCountSummary o1, InventoryCountSummary o2) {
+                        return o2.getWeekEndDate().compareTo(o1.getWeekEndDate());
+                    }
+
+                });
                 inventoyCountSummaryAdapter = new InventoyCountSummaryAdapter(InventoryCountSummaryActivity.this, inventoryCountSummaries);
                 recyclerView.setAdapter(inventoyCountSummaryAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountSummaryActivity.this));
@@ -61,7 +84,7 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
 
             @Override
             public void onFailure(Call<InventoryCountSummaryResponse> call, Throwable t) {
-
+                progressBarVisibility.showProgress(false);
             }
         });
     }

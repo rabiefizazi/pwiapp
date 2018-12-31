@@ -6,26 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".activities.InventoryCountSummaryActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Login progress -->
+    <ProgressBar
+        android:id="@+id/inventory_count_details_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/signup_form"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="196dp"
+        android:layout_marginBottom="240dp"
+        android:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <android.support.v7.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/inventory_summary_count_card"
+            android:id="@+id/inventory_count_summary_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="1dp"
             android:clickable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            >
+            android:foreground="?android:attr/selectableItemBackground">
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="1dp">
+                android:layout_marginBottom="1dp"
+                android:background="@color/DarkOliveGreen">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -51,11 +66,10 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="128dp"
-                    android:layout_marginTop="22dp"
-                    android:gravity="center"
-                    android:text="Cost"
-                    android:textAlignment="textEnd"
+                    android:layout_marginStart="110dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="bottom"
+                    android:text="|"
                     android:textSize="18dp" />
 
                 <TextView
@@ -63,12 +77,23 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="238dp"
+                    android:layout_marginStart="128dp"
                     android:layout_marginTop="22dp"
                     android:gravity="center"
-                    android:text="Unit"
+                    android:text="Cost"
                     android:textAlignment="textEnd"
                     android:textSize="18dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="175dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="bottom"
+                    android:text="|"
+                    android:textSize="18dp" />
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -81,13 +106,43 @@
                     android:text="Qty"
                     android:textAlignment="textEnd"
                     android:textSize="18dp" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="288dp"
+                    android:layout_marginStart="225dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="bottom"
+                    android:text="|"
+                    android:textSize="18dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="238dp"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center"
+                    android:text="Unit"
+                    android:textAlignment="textEnd"
+                    android:textSize="18dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="275dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="bottom"
+                    android:text="|"
+                    android:textSize="18dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="283dp"
                     android:layout_marginTop="22dp"
                     android:gravity="center"
                     android:text="Master?"
@@ -95,6 +150,7 @@
                     android:textSize="18dp" />
             </RelativeLayout>
         </android.support.v7.widget.CardView>
+
         <ScrollView
             android:id="@+id/scrollView1"
             android:layout_width="wrap_content"
@@ -114,7 +170,8 @@
                     android:gravity="bottom"
                     android:maxLines="100"
                     android:scrollbars="vertical"
-                    android:scrollHorizontally="false" />
+                    android:scrollHorizontally="false"
+                    android:visibility="gone" />
 
                 <EditText
                     android:id="@+id/textViewData1"
@@ -123,7 +180,9 @@
                     android:gravity="bottom"
                     android:maxLines="100"
                     android:scrollbars="vertical"
-                    android:scrollHorizontally="false" />
+                    android:scrollHorizontally="false"
+                    android:visibility="gone" />
+
                 <EditText
                     android:id="@+id/textViewData2"
                     android:layout_width="242dp"
@@ -131,27 +190,31 @@
                     android:gravity="bottom"
                     android:maxLines="100"
                     android:scrollbars="vertical"
-                    android:scrollHorizontally="false" />
+                    android:scrollHorizontally="false"
+                    android:visibility="gone" />
 
             </LinearLayout>
         </ScrollView>
+
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Data:" />
+            android:text="Data:"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/textViewStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/buttonStartScan"
-            android:text="Status:" />
+            android:text="Status:"
+            android:visibility="gone" />
 
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/inventory_details_count_recyclerview"
+            android:id="@+id/inventory_count_details_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">

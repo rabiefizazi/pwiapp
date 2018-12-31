@@ -63,15 +63,15 @@ public class InventoyCountDetailsAdapter extends RecyclerView.Adapter<InventoyCo
 //                getInventoryDetails(storeId, departmentId, weekEndDate, totalInventory);
             }
 
-            public void getInventoryDetails(Integer storeId, Integer departmentId, String weekEndDate, Double totalInventory) {
-                InventoryCountSummary inventoryCountSummary = new InventoryCountSummary(storeId, departmentId, weekEndDate, totalInventory);
-                SharedPrefManagerInventorySummary.getInstance(mContext).clear();
-                SharedPrefManagerInventorySummary.getInstance(mContext).saveInventoryCountSummary(inventoryCountSummary);
-
-                Intent intent = new Intent(mContext, InventoryCountDetailsActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                mContext.startActivity(intent);
-            }
+//            public void getInventoryDetails(Integer storeId, Integer departmentId, String weekEndDate, Double totalInventory) {
+//                InventoryCountSummary inventoryCountSummary = new InventoryCountSummary(storeId, departmentId, weekEndDate, totalInventory, position);
+//                SharedPrefManagerInventorySummary.getInstance(mContext).clear();
+//                SharedPrefManagerInventorySummary.getInstance(mContext).saveInventoryCountSummary(inventoryCountSummary);
+//
+//                Intent intent = new Intent(mContext, InventoryCountDetailsActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                mContext.startActivity(intent);
+//            }
         });
     }
 

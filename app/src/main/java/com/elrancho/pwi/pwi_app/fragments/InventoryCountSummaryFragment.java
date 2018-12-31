@@ -43,7 +43,7 @@ package com.elrancho.pwi.pwi_app.fragments;//package com.elrancho.pwi.pwi_app.fr
 //
 //        View inflateView = getLayoutInflater().inflate(R.layout.inventory_count_summary_content, null);
 //
-//        inflateView.findViewById(R.id.inventory_summary_count_card).setOnClickListener(this);
+//        inflateView.findViewById(R.id.inventory_count_summary_card).setOnClickListener(this);
 //
 //        return view;
 //
@@ -58,7 +58,7 @@ package com.elrancho.pwi.pwi_app.fragments;//package com.elrancho.pwi.pwi_app.fr
 //        String storeId = SharedPrefManagerDepartment.getInstance(getContext()).getDepartment().getStoreId();
 //        String departmentId = SharedPrefManagerDepartment.getInstance(getContext()).getDepartment().getDepartmentId();
 //
-//        recyclerView = view.findViewById(R.id.inventory_summary_count_recyclerview);
+//        recyclerView = view.findViewById(R.id.inventory_count_summary_recyclerview);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 //
 //        Call<InventoryCountSummaryResponse> call = InventoryCountSummaryRetrofit
@@ -98,7 +98,7 @@ package com.elrancho.pwi.pwi_app.fragments;//package com.elrancho.pwi.pwi_app.fr
 //        TextView totalInventory = inflateView.findViewById(R.id.tvInventoryCountSummary);
 //
 //        switch (view.getId()) {
-//            case R.id.inventory_summary_count_card:
+//            case R.id.inventory_count_summary_card:
 //
 //                getInventoryDetails(storeId, departmentId, weekEndDate.getText().toString(), Double.parseDouble(totalInventory.getText().toString()));
 //                break;

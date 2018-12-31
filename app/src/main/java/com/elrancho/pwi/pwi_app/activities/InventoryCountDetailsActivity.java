@@ -1,13 +1,12 @@
 package com.elrancho.pwi.pwi_app.activities;
 
-import android.app.ActionBar;
-import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -24,11 +23,11 @@ import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountDetailsAdapter;
 import com.elrancho.pwi.pwi_app.api.InventoryCountDetailsRetrofit;
 import com.elrancho.pwi.pwi_app.api.ItemRetrofit;
-import com.elrancho.pwi.pwi_app.api.UserRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetailsResponse;
 import com.elrancho.pwi.pwi_app.models.responses.Item;
 import com.elrancho.pwi.pwi_app.models.responses.ItemResponse;
+import com.elrancho.pwi.pwi_app.shared.ProgressBarVisibility;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
@@ -51,7 +50,8 @@ import com.symbol.emdk.barcode.StatusData;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +61,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class InventoryCountDetailsActivity extends Activity implements EMDKListener, DataListener, StatusListener, ScannerConnectionListener {
+public class InventoryCountDetailsActivity extends AppCompatActivity implements EMDKListener, DataListener, StatusListener, ScannerConnectionListener {
 
     //vars for the InventoryCountDetails Retrofit call
     private RecyclerView recyclerView;
     private InventoyCountDetailsAdapter inventoyCountDetailsAdapter;
     private List<InventoryCountDetails> inventoryCounts;
-
-    //vars for item retrofit call
-    private List<Item> items;
 
     private EMDKManager emdkManager = null;
     private BarcodeManager barcodeManager = null;
@@ -87,17 +84,23 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
     private String statusString = "";
     private boolean isInventoryCountExist = false;
 
+    private ProgressBarVisibility progressBarVisibility;
+
+    private View vInventoryCountDetailsForm;
+    private View vProgressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_details_recyclerview);
 
-        ActionBar actionBar = getActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.Sienna)));
+        vInventoryCountDetailsForm = findViewById(R.id.content_layout);
+        vProgressBar = findViewById(R.id.inventory_count_details_progress);
 
         retrofitCallInventoryCountDetails();
 
-        beginScanning();
+            beginScanning();
+
     }
 
     public void retrofitCallInventoryCountDetails() {
@@ -107,17 +110,29 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
         String departmentId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getDepartmentId();
         String weekEndDate = SharedPrefManagerInventorySummary.getInstance(this).getInventorySummary().getWeekEndDate();
 
-        recyclerView = findViewById(R.id.inventory_details_count_recyclerview);
+        recyclerView = findViewById(R.id.inventory_count_details_recyclerview);
 
         Call<InventoryCountDetailsResponse> call = InventoryCountDetailsRetrofit
                 .getInstance().getInventoryCountDetailsApi().getInventoryCountDetails(token, storeId, departmentId, weekEndDate);
 
+        progressBarVisibility = new ProgressBarVisibility(this, vInventoryCountDetailsForm, vProgressBar);
+        progressBarVisibility.showProgress(true);
 
         call.enqueue(new Callback<InventoryCountDetailsResponse>() {
             @Override
             public void onResponse(Call<InventoryCountDetailsResponse> call, Response<InventoryCountDetailsResponse> response) {
+                progressBarVisibility.showProgress(false);
 
                 inventoryCounts = response.body().getInventoryCounts();
+                Collections.sort(inventoryCounts, new Comparator<InventoryCountDetails>() {
+                    @Override
+                    public int compare(InventoryCountDetails o1, InventoryCountDetails o2) {
+                        if (!o2.getDateUpdated().equals(null))
+                            return o2.getDateUpdated().compareTo(o1.getDateUpdated());
+                        return 0;
+                    }
+
+                });
                 inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, inventoryCounts);
                 recyclerView.setAdapter(inventoyCountDetailsAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivity.this));
@@ -125,6 +140,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
             @Override
             public void onFailure(Call<InventoryCountDetailsResponse> call, Throwable t) {
+                progressBarVisibility.showProgress(false);
 
             }
         });
@@ -136,16 +152,19 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
         String token = SharedPrefManager.getInstance(this).getUuser().getToken();
         String storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
 
-        recyclerView = findViewById(R.id.inventory_details_count_recyclerview);
+        recyclerView = findViewById(R.id.inventory_count_details_recyclerview);
 
         t2 = findViewById(R.id.textViewData2);
 
         Call<ItemResponse> call = ItemRetrofit.getInstance().getItemApi().getItem(token, storeId, vendorItem);
 
+        progressBarVisibility = new ProgressBarVisibility(this, vInventoryCountDetailsForm, vProgressBar);
+        progressBarVisibility.showProgress(true);
 
         call.enqueue(new Callback<ItemResponse>() {
             @Override
             public void onResponse(Call<ItemResponse> call, Response<ItemResponse> response) {
+                progressBarVisibility.showProgress(false);
 
                 Integer storeId = response.body().getItems().get(0).getStoreId();
                 String itemDescription = response.body().getItems().get(0).getDescription();
@@ -232,8 +251,6 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
                                     //************************************************************************************************************************
                                     // Build the Json Request
-
-
                                     Map<String, String> jsonParams = new ArrayMap<>();
                                     jsonParams.put("storeId", SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getStoreId());
                                     jsonParams.put("departmentId", SharedPrefManagerDepartment.getInstance(InventoryCountDetailsActivity.this).getDepartment().getDepartmentId());
@@ -256,16 +273,18 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
                                                 .getInventoryCountDetailsApi().updateInventoryCountDetail(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser()
                                                         .getToken(), newInventoryCount);
 
+                                    progressBarVisibility = new ProgressBarVisibility(InventoryCountDetailsActivity.this, vInventoryCountDetailsForm, vProgressBar);
+                                    progressBarVisibility.showProgress(true);
+
                                     call.enqueue(new Callback<ResponseBody>() {
                                         @Override
                                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                            if (response.code() == 201) {
+                                            progressBarVisibility.showProgress(false);
+
+                                            if (response.code() == 200) {
 
                                                 ResponseBody dr = response.body();
-                                                Toast.makeText(InventoryCountDetailsActivity.this, "Success", Toast.LENGTH_LONG).show();
-
-                                            } else if (response.code() == 422) {
-                                                Toast.makeText(InventoryCountDetailsActivity.this, "User already exist", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(InventoryCountDetailsActivity.this, "saved", Toast.LENGTH_SHORT).show();
                                             } else {
                                                 Toast.makeText(InventoryCountDetailsActivity.this, "The Service is down. Please try again later", Toast.LENGTH_LONG).show();
                                             }
@@ -273,6 +292,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
                                         @Override
                                         public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                            progressBarVisibility.showProgress(false);
 
                                             Toast.makeText(InventoryCountDetailsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
 
@@ -292,7 +312,7 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
             @Override
             public void onFailure(Call<ItemResponse> call, Throwable t) {
-
+                progressBarVisibility.showProgress(false);
             }
         });
     }
@@ -380,6 +400,8 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
                         e.printStackTrace();
                     }
 
+                    //Set MSI
+                    setDecoders();
                     scanner.read();
                 } catch (ScannerException e) {
                     statusString = e.getMessage();
@@ -571,10 +593,8 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
             try {
 
                 if (scanner.isEnabled()) {
-                    ScannerConfig config = scanner.getConfig();
                     //Set MSI
-                    config.decoderParams.msi.enabled = true;
-                    scanner.setConfig(config);
+                    setDecoders();
                     // Submit a new read.
                     scanner.read();
 
@@ -665,7 +685,18 @@ public class InventoryCountDetailsActivity extends Activity implements EMDKListe
 
         protected void onPostExecute(String result) {
 
-            retrofitCallItemDetails(result);
+            //allow scanning only if the selected week is the current week(the week with the position 0 in the inventoryCountSummaries adapter
+            int position = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getPosition();
+            if (position == 0)
+                retrofitCallItemDetails(result);
+            else {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                alertDialogBuilder.setTitle("Week closed!");
+                alertDialogBuilder.setMessage("The selected week is closed. Scanning is allowed for the current week only.");
+                alertDialogBuilder.setPositiveButton("OK", null);
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
         }
     }
 
