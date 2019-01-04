@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/a1"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:text="Vendor Item: "
+                android:textSize="18dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/b1"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_below="@+id/a1"
+                android:layout_alignEnd="@+id/a1"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:text="Description: "
+                android:textSize="18dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/c1"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_below="@+id/b1"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:text="Cost per unit: "
+                android:textSize="18dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/d1"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_below="@+id/c1"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:text="Unit measure: "
+                android:textSize="18dp"
+                android:gravity="center"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_below="@+id/d1"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="15dp"
+                android:text="Enter Quantity: "
+                android:textSize="18dp"
+                android:gravity="center" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/vendorItem"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:ems="5"
+                android:textSize="18dp"
+                android:background="@drawable/edittext_background"
+                android:inputType="numberDecimal"/>
+
+            <EditText
+                android:id="@+id/item_description"
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/vendorItem"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="9dp"
+                android:textSize="18dp"
+                android:background="@drawable/edittext_background"
+                android:maxLines="1"
+                android:singleLine="true"/>
+
+            <EditText
+                android:id="@+id/item_cost"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_below="@+id/item_description"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="9dp"
+                android:ems="5"
+                android:textSize="18dp"
+                android:background="@drawable/edittext_background"
+                android:inputType="numberDecimal"/>
+
+
+            <EditText
+                android:id="@+id/unit_of_measure"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_below="@+id/item_cost"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="9dp"
+                android:ems="3"
+                android:textSize="18dp"
+                android:background="@drawable/edittext_background"
+                android:maxLines="1"
+                android:singleLine="true"/>
+            <AutoCompleteTextView
+                android:id="@+id/etQuantity"
+                android:layout_width="wrap_content"
+                android:layout_height="75dp"
+                android:layout_below="@+id/unit_of_measure"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="9dp"
+                android:ems="2"
+                android:background="@drawable/edittext_background"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textSize="48dp" />
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>

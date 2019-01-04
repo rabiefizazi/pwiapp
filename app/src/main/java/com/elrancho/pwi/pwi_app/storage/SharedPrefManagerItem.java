@@ -3,6 +3,7 @@ package com.elrancho.pwi.pwi_app.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.elrancho.pwi.pwi_app.activities.InventoryCountDetailsActivity;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 import com.elrancho.pwi.pwi_app.models.responses.Item;
 
@@ -63,5 +64,12 @@ public class SharedPrefManagerItem {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+    }
+
+    public boolean isEmpty(){
+
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+
+        return SharedPrefManagerItem.getInstance(mContext).getItem().getDescription() == null;
     }
 }

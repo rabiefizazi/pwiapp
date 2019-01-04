@@ -55,10 +55,10 @@ public class InventoyCountSummaryAdapter extends RecyclerView.Adapter<InventoyCo
                 String weekEndDate = inventoryCountSummariesList.get(position).getWeekEndDate();
                 Double totalInventory = inventoryCountSummariesList.get(position).getTotalInventory();
 
-                getInventoryDetails(storeId, departmentId, weekEndDate, totalInventory, position);
+                saveSelectedWeekInfo(storeId, departmentId, weekEndDate, totalInventory, position);
             }
 
-            public void getInventoryDetails(Integer storeId, Integer departmentId, String weekEndDate, Double totalInventory, int position) {
+            public void saveSelectedWeekInfo(Integer storeId, Integer departmentId, String weekEndDate, Double totalInventory, int position) {
                 InventoryCountSummary inventoryCountSummary = new InventoryCountSummary(storeId, departmentId, weekEndDate, totalInventory, position);
                 SharedPrefManagerInventorySummary.getInstance(mContext).clear();
                 SharedPrefManagerInventorySummary.getInstance(mContext).saveInventoryCountSummary(inventoryCountSummary);

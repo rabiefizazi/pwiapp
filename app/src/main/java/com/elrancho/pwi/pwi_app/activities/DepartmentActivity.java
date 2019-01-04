@@ -19,7 +19,7 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_departments);
+        setContentView(R.layout.departments_activity);
 
         String token = SharedPrefManager.getInstance(this).getUuser().getToken();
 

@@ -46,7 +46,7 @@ public class InventoyCountDetailsAdapter extends RecyclerView.Adapter<InventoyCo
         holder.tvVendorItem.setText(inventoryCountsList.get(position).getVendorItem().toString());
         holder.tvCost.setText(inventoryCountsList.get(position).getCost().toString());
         holder.tvQuantity.setText(inventoryCountsList.get(position).getQuantity().toString());
-        //holder.tvUnit.setText(inventoryCountsList.get(position));
+        holder.tvUnit.setText(inventoryCountsList.get(position).getUnitOfMeasure());
         holder.tvIsItemMaster.setText(inventoryCountsList.get(position).getItemMaster().toString());
 
 

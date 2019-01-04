@@ -1,12 +1,8 @@
 package com.elrancho.pwi.pwi_app.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
@@ -19,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.api.UserRetrofit;
@@ -55,7 +50,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup);
+        setContentView(R.layout.signup_activity);
 
         vSignupForm = findViewById(R.id.signup_form);
         vProgressBar = findViewById(R.id.signup_progress);
@@ -243,8 +238,12 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
                 } else if (response.code() == 422) {
 
-                    alertDialogBuilder.setTitle("Account already exist");
+                    alertDialogBuilder.setTitle("Account exist");
                     alertDialogBuilder.setMessage("Account " + etUsername.getText().toString()+" already exist.");
+                }else if (response.code() == 302) {
+
+                    alertDialogBuilder.setTitle("Email Found");
+                    alertDialogBuilder.setMessage("Email " + etEmail.getText().toString()+" already Associated with another account.");
                 } else {
                     alertDialogBuilder.setTitle("The Service is down");
                     alertDialogBuilder.setMessage("The Service is down. Please try again later");

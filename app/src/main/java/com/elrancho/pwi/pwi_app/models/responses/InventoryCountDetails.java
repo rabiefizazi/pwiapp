@@ -12,8 +12,9 @@ public class InventoryCountDetails {
     private String weekEndDate;
     private String  dateUpdated;
     private Boolean itemMaster;
+    private String unitOfMeasure;
 
-    public InventoryCountDetails(Integer storeId, Integer departmentId, String userId, Integer vendorItem, Double cost, Integer quantity, String weekEndDate, String  dateUpdated, Boolean itemMaster) {
+    public InventoryCountDetails(Integer storeId, Integer departmentId, String userId, Integer vendorItem, Double cost, Integer quantity, String weekEndDate, String  dateUpdated, Boolean itemMaster, String unitOfMeasure) {
         this.storeId = storeId;
         this.departmentId = departmentId;
         this.userId = userId;
@@ -23,6 +24,7 @@ public class InventoryCountDetails {
         this.weekEndDate = weekEndDate;
         this.dateUpdated = dateUpdated;
         this.itemMaster = itemMaster;
+        this.unitOfMeasure=unitOfMeasure;
     }
 
     public Integer getStoreId() {
@@ -103,5 +105,13 @@ public class InventoryCountDetails {
 
     public void setItemMaster(Boolean itemMaster) {
         this.itemMaster = itemMaster;
+    }
+
+    public String getUnitOfMeasure() {
+        return unitOfMeasure;
+    }
+
+    public void setUnitOfMeasure(String unitOfMeasure) {
+        this.unitOfMeasure = unitOfMeasure;
     }
 }
