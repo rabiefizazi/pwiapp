@@ -55,6 +55,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         vSignupForm = findViewById(R.id.signup_form);
         vProgressBar = findViewById(R.id.signup_progress);
 
+        getSupportActionBar().setTitle("Sign Up");
+
         sStore = findViewById(R.id.store);
         sStore.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
             @Override
@@ -240,16 +242,19 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
                     alertDialogBuilder.setTitle("Account exist");
                     alertDialogBuilder.setMessage("Account " + etUsername.getText().toString()+" already exist.");
+                    alertDialogBuilder.setPositiveButton("OK", null);
                 }else if (response.code() == 302) {
 
                     alertDialogBuilder.setTitle("Email Found");
                     alertDialogBuilder.setMessage("Email " + etEmail.getText().toString()+" already Associated with another account.");
+                    alertDialogBuilder.setPositiveButton("OK", null);
                 } else {
                     alertDialogBuilder.setTitle("The Service is down");
                     alertDialogBuilder.setMessage("The Service is down. Please try again later");
+                    alertDialogBuilder.setPositiveButton("OK", null);
                 }
 
-                alertDialogBuilder.setPositiveButton("OK", null);
+
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
             }

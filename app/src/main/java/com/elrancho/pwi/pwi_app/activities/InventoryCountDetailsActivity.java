@@ -81,7 +81,6 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     private TextView textViewData = null;
     private TextView textViewStatus = null;
 
-    private TextView t2;
     private List<ScannerInfo> deviceList = null;
 
     private int scannerIndex = 0; // Keep the selected scanner
@@ -97,13 +96,25 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     AlertDialog enterQuantityDialog;
     AlertDialog addNewItemDialog;
 
+    TextView etWeekEndDate;
+
+    private String token, storeId, departmentId, weekEndDate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_details_recyclerview);
 
+        token = SharedPrefManager.getInstance(this).getUuser().getToken();
+        storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
+        departmentId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getDepartmentId();
+        weekEndDate = SharedPrefManagerInventorySummary.getInstance(this).getInventorySummary().getWeekEndDate();
+
         vInventoryCountDetailsForm = findViewById(R.id.content_layout);
         vProgressBar = findViewById(R.id.inventory_count_details_progress);
+
+        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId())%1000;
+        getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Week "+weekEndDate);
 
         retrofitCallInventoryCountDetails();
 
@@ -112,11 +123,6 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     }
 
     public void retrofitCallInventoryCountDetails() {
-
-        String token = SharedPrefManager.getInstance(this).getUuser().getToken();
-        String storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
-        String departmentId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getDepartmentId();
-        String weekEndDate = SharedPrefManagerInventorySummary.getInstance(this).getInventorySummary().getWeekEndDate();
 
         recyclerView = findViewById(R.id.inventory_count_details_recyclerview);
 
@@ -158,12 +164,8 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     public void retrofitCallItemDetails(String vendorItem) {
 
         final String scannedVendorItem = vendorItem;
-        String token = SharedPrefManager.getInstance(this).getUuser().getToken();
-        String storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
 
         recyclerView = findViewById(R.id.inventory_count_details_recyclerview);
-
-        t2 = findViewById(R.id.textViewData2);
 
         Call<ItemResponse> call = ItemRetrofit.getInstance().getItemApi().getItem(token, storeId, scannedVendorItem);
 
@@ -276,98 +278,102 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
                     alertDialogBuilder.setTitle("Item Not found!");
-                    alertDialogBuilder.setMessage("item " + scannedVendorItem + " not found in the item master. Would you like to added?");
-                    alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
-                            final View newItemDialog = inflater.inflate(R.layout.add_new_item, null);
-
-                            final EditText etVendorItem = newItemDialog.findViewById(R.id.vendorItem);
-                            final EditText etItemDescription = newItemDialog.findViewById(R.id.item_description);
-
-                            final EditText etItemCost = newItemDialog.findViewById(R.id.item_cost);
-                            final EditText etUnitOfMeasure = newItemDialog.findViewById(R.id.unit_of_measure);
-                            final EditText etQuantity = newItemDialog.findViewById(R.id.etQuantity);
-
-                            etVendorItem.setText(scannedVendorItem);
-
-
-                            addNewItemDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
-                                    .setTitle("Enter item information")
-                                    .setView(newItemDialog)
-                                    .setPositiveButton("OK", null)
-                                    .setNegativeButton("Cancel", null).create();
-
-                            addNewItemDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                                @Override
-                                public void onShow(DialogInterface dialog) {
-                                    Button okButton = addNewItemDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                                    etVendorItem.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                                        @Override
-                                        public void onFocusChange(View v, boolean hasFocus) {
-                                            etVendorItem.post(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                                    inputMethodManager.showSoftInput(etVendorItem, InputMethodManager.SHOW_IMPLICIT);
-                                                }
-                                            });
-                                        }
-                                    });
-                                    etVendorItem.requestFocus();
-                                    etVendorItem.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                                        @Override
-                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                            etItemDescription.requestFocus();
-                                            return false;
-                                        }
-                                    });
-                                    etItemDescription.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                                        @Override
-                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                            etItemCost.requestFocus();
-                                            return false;
-                                        }
-                                    });
-                                    etItemCost.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                                        @Override
-                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                            etUnitOfMeasure.requestFocus();
-                                            return false;
-                                        }
-                                    });
-                                    etUnitOfMeasure.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                                        @Override
-                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                            etQuantity.requestFocus();
-                                            return false;
-                                        }
-                                    });
-                                    etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                                        @Override
-                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                            createItem(etVendorItem, etItemDescription, etItemCost, etUnitOfMeasure, etQuantity);
-                                            addNewItemDialog.dismiss();
-                                            return false;
-                                        }
-                                    });
-                                    okButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            createItem(etVendorItem, etItemDescription, etItemCost, etUnitOfMeasure, etQuantity);
-                                            addNewItemDialog.dismiss();
-
-                                        }
-                                    });
-                                }
-                            });
-                            addNewItemDialog.show();
-
-
-                        }
-                    });
-                    alertDialogBuilder.setNegativeButton("No", null);
+                    //commented line below replaced with the line below it to block the adding new item function
+                    //alertDialogBuilder.setMessage("item " + scannedVendorItem + " not found in the item master. Would you like to added?");
+                    alertDialogBuilder.setMessage("item " + scannedVendorItem + " not found in the item master.2");
+//                    alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
+//                            final View newItemDialog = inflater.inflate(R.layout.add_new_item, null);
+//
+//                            final EditText etVendorItem = newItemDialog.findViewById(R.id.vendorItem);
+//                            final EditText etItemDescription = newItemDialog.findViewById(R.id.item_description);
+//
+//                            final EditText etItemCost = newItemDialog.findViewById(R.id.item_cost);
+//                            final EditText etUnitOfMeasure = newItemDialog.findViewById(R.id.unit_of_measure);
+//                            final EditText etQuantity = newItemDialog.findViewById(R.id.etQuantity);
+//
+//                            etVendorItem.setText(scannedVendorItem);
+//
+//
+//                            addNewItemDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
+//                                    .setTitle("Enter item information")
+//                                    .setView(newItemDialog)
+//                                    .setPositiveButton("OK", null)
+//                                    .setNegativeButton("Cancel", null).create();
+//
+//                            addNewItemDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+//                                @Override
+//                                public void onShow(DialogInterface dialog) {
+//                                    Button okButton = addNewItemDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+//                                    etVendorItem.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//                                        @Override
+//                                        public void onFocusChange(View v, boolean hasFocus) {
+//                                            etVendorItem.post(new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                    InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+//                                                    inputMethodManager.showSoftInput(etVendorItem, InputMethodManager.SHOW_IMPLICIT);
+//                                                }
+//                                            });
+//                                        }
+//                                    });
+//                                    etVendorItem.requestFocus();
+//                                    etVendorItem.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//                                        @Override
+//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                                            etItemDescription.requestFocus();
+//                                            return false;
+//                                        }
+//                                    });
+//                                    etItemDescription.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//                                        @Override
+//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                                            etItemCost.requestFocus();
+//                                            return false;
+//                                        }
+//                                    });
+//                                    etItemCost.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//                                        @Override
+//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                                            etUnitOfMeasure.requestFocus();
+//                                            return false;
+//                                        }
+//                                    });
+//                                    etUnitOfMeasure.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//                                        @Override
+//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                                            etQuantity.requestFocus();
+//                                            return false;
+//                                        }
+//                                    });
+//                                    etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//                                        @Override
+//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                                            createItem(etVendorItem, etItemDescription, etItemCost, etUnitOfMeasure, etQuantity);
+//                                            addNewItemDialog.dismiss();
+//                                            return false;
+//                                        }
+//                                    });
+//                                    okButton.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            createItem(etVendorItem, etItemDescription, etItemCost, etUnitOfMeasure, etQuantity);
+//                                            addNewItemDialog.dismiss();
+//
+//                                        }
+//                                    });
+//                                }
+//                            });
+//                            addNewItemDialog.show();
+//
+//
+//                        }
+//                    });
+                    alertDialogBuilder.setPositiveButton("OK", null);
+                    //commented line below to block the adding new item function
+                    //alertDialogBuilder.setNegativeButton("No", null);
                     AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.show();
                 }

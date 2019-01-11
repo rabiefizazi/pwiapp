@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountSummaryAdapter;
@@ -43,15 +44,53 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
     private View vInventoryCountSummaryForm;
     private View vProgressBar;
 
+    private TextView etDepartment;
+
     private View fab;
+
+    private String token, storeId, departmentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_summary_recyclerview);
 
+        token = SharedPrefManager.getInstance(this).getUuser().getToken();
+
+        storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
+        departmentId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getDepartmentId();
+
         vInventoryCountSummaryForm = findViewById(R.id.content_layout);
         vProgressBar = findViewById(R.id.inventory_count_summary_progress);
+
+        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId())%1000;
+        String last3digits = departmentId.substring(4);
+        switch (last3digits) {
+            case "108":
+                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Dairy");
+                break;
+            case "200":
+                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Meat");
+                break;
+            case "300":
+                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Seafood");
+                break;
+            case "400":
+                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Produce");
+                break;
+            case "500":
+                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Bakery");
+                break;
+            case "501":
+                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Cake");
+                break;
+            case "600":
+                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Kitchen");
+                break;
+            case "700":
+                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Tortilleria");
+                break;
+        }
 
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -72,9 +111,6 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
 
     public void retrofitCallInventoryCountSummary() {
 
-        String token = SharedPrefManager.getInstance(this).getUuser().getToken();
-        String storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
-        String departmentId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getDepartmentId();
 
         recyclerView = findViewById(R.id.inventory_count_summary_recyclerview);
 

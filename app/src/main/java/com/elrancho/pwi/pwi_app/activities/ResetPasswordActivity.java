@@ -47,6 +47,8 @@ public class ResetPasswordActivity extends AppCompatActivity implements View.OnC
         vPasswordResetForm = findViewById(R.id.reset_password_form);
         vProgressBar = findViewById(R.id.reset_password_progress);
 
+        getSupportActionBar().setTitle("Password Reset");
+
     }
 
     @Override
@@ -85,7 +87,7 @@ public class ResetPasswordActivity extends AppCompatActivity implements View.OnC
                     }
                     else{
                         alertDialogBuilder.setTitle("Check your email");
-                        alertDialogBuilder.setMessage("We've sent a verification link to "+etEmail.getText().toString()+".");
+                        alertDialogBuilder.setMessage("Instructions have been sent to "+etEmail.getText().toString()+".\n Check your email and follow the instructions to reset your password");
                         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {

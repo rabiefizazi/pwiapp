@@ -26,18 +26,17 @@
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
             android:name=".activities.SignupActivity"
-            android:parentActivityName=".activities.LoginActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+            android:parentActivityName=".activities.LoginActivity"/>
         <activity
             android:name=".activities.DepartmentActivity"
             android:label="@string/activity_departments" />
         <activity
             android:name=".activities.InventoryCountSummaryActivity"
             android:label="@string/title_activity_inventory_count_summary"
-            android:parentActivityName=".activities.DepartmentActivity"></activity>
+            android:parentActivityName=".activities.DepartmentActivity" />
         <activity
             android:name=".activities.InventoryCountDetailsActivity"
             android:label="@string/title_activity_inventory_count_details"
@@ -51,7 +50,8 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ResetPasswordActivity"></activity>
+        <activity android:name=".activities.ResetPasswordActivity"
+            android:parentActivityName=".activities.LoginActivity"/>
     </application>
 
 </manifest>

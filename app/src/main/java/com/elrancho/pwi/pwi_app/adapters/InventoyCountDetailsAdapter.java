@@ -47,7 +47,12 @@ public class InventoyCountDetailsAdapter extends RecyclerView.Adapter<InventoyCo
         holder.tvCost.setText(inventoryCountsList.get(position).getCost().toString());
         holder.tvQuantity.setText(inventoryCountsList.get(position).getQuantity().toString());
         holder.tvUnit.setText(inventoryCountsList.get(position).getUnitOfMeasure());
-        holder.tvIsItemMaster.setText(inventoryCountsList.get(position).getItemMaster().toString());
+
+        //if false change to No, if true change to Yes
+        if (inventoryCountsList.get(position).getItemMaster().toString() == "true")
+            holder.tvIsItemMaster.setText("Yes");
+        else
+            holder.tvIsItemMaster.setText("No");
 
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {

@@ -7,8 +7,8 @@
         <item name="colorPrimaryDark">@color/SaddleBrown</item>
         <item name="colorAccent">@color/SaddleBrown</item>
         <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
-        <item name="android:icon">@drawable/elranchologo_24x24</item>
-        <item name="icon">@drawable/elranchologo_24x24</item>
+        <!--<item name="android:icon">@drawable/elranchologo_24x24</item>-->
+        <!--<item name="icon">@drawable/elranchologo_24x24</item>-->
     </style>
     <style name="AppTheme.ActionBar" parent="@style/Widget.AppCompat.ActionBar">
         <item name="android:displayOptions">showHome|showTitle</item>

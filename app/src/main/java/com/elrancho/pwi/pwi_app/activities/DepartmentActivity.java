@@ -31,6 +31,10 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
         findViewById(R.id.produce_card).setOnClickListener(this);
         findViewById(R.id.seafood_card).setOnClickListener(this);
         findViewById(R.id.tortilleria_card).setOnClickListener(this);
+
+        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId())%1000;
+
+        getSupportActionBar().setTitle("Store "+storeIdTitle);
     }
 
     @Override
