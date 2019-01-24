@@ -66,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="110dp"
+                    android:layout_marginStart="115dp"
                     android:layout_marginTop="20dp"
                     android:gravity="bottom"
                     android:text="|"
@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="128dp"
+                    android:layout_marginStart="138dp"
                     android:layout_marginTop="22dp"
                     android:gravity="center"
                     android:text="Cost"
@@ -89,7 +89,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="175dp"
+                    android:layout_marginStart="195dp"
                     android:layout_marginTop="20dp"
                     android:gravity="bottom"
                     android:text="|"
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="190dp"
+                    android:layout_marginStart="220dp"
                     android:layout_marginTop="22dp"
                     android:gravity="center"
                     android:text="Qty"
@@ -113,8 +113,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="225dp"
+                    android:layout_marginStart="265dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="30dp"
                     android:gravity="bottom"
                     android:text="|"
                     android:textSize="18dp" />
@@ -124,22 +125,11 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="238dp"
+                    android:layout_marginStart="280dp"
                     android:layout_marginTop="22dp"
                     android:gravity="center"
                     android:text="Unit"
                     android:textAlignment="textEnd"
-                    android:textSize="18dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginStart="275dp"
-                    android:layout_marginTop="20dp"
-                    android:gravity="bottom"
-                    android:text="|"
                     android:textSize="18dp" />
 
                 <TextView
@@ -152,7 +142,8 @@
                     android:gravity="center"
                     android:text="Master?"
                     android:textAlignment="textEnd"
-                    android:textSize="18dp" />
+                    android:textSize="18dp"
+                    android:visibility="gone"/>
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 

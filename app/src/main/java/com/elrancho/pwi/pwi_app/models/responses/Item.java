@@ -5,17 +5,35 @@ import com.google.gson.annotations.SerializedName;
 
 public class Item {
 
-    private Integer itemUPC;
-    private Integer vendorItem;
-    private Integer storeId;
+    @SerializedName("itemUPC")
+    @Expose
+    private long itemUPC;
+    @SerializedName("vendorItem")
+    @Expose
+    private long vendorItem;
+    @SerializedName("storeId")
+    @Expose
+    private long storeId;
+    @SerializedName("description")
+    @Expose
     private String description;
-    private Object category;
+    @SerializedName("category")
+    @Expose
+    private String category;
+    @SerializedName("cost")
+    @Expose
     private Double cost;
+    @SerializedName("unitOfMeasure")
+    @Expose
     private String unitOfMeasure;
+    @SerializedName("itemMaster")
+    @Expose
     private Boolean itemMaster;
+    @SerializedName("dateUploaded")
+    @Expose
     private String dateUploaded;
 
-    public Item(Integer itemUPC, Integer vendorItem, Integer storeId, String description, Object category, Double cost, String unitOfMeasure, Boolean itemMaster, String dateUploaded) {
+    public Item(long itemUPC, long vendorItem, long storeId, String description, String category, Double cost, String unitOfMeasure, Boolean itemMaster, String dateUploaded) {
         this.itemUPC = itemUPC;
         this.vendorItem = vendorItem;
         this.storeId = storeId;
@@ -27,15 +45,15 @@ public class Item {
         this.dateUploaded = dateUploaded;
     }
 
-    public Integer getItemUPC() {
+    public long getItemUPC() {
         return itemUPC;
     }
 
-    public void setItemUPC(Integer itemUPC) {
+    public void setItemUPC(long itemUPC) {
         this.itemUPC = itemUPC;
     }
 
-    public Integer getVendorItem() {
+    public long getVendorItem() {
         return vendorItem;
     }
 
@@ -43,11 +61,11 @@ public class Item {
         this.vendorItem = vendorItem;
     }
 
-    public Integer getStoreId() {
+    public long getStoreId() {
         return storeId;
     }
 
-    public void setStoreId(Integer storeId) {
+    public void setStoreId(long storeId) {
         this.storeId = storeId;
     }
 
@@ -59,11 +77,11 @@ public class Item {
         this.description = description;
     }
 
-    public Object getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Object category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
@@ -98,4 +116,5 @@ public class Item {
     public void setDateUploaded(String dateUploaded) {
         this.dateUploaded = dateUploaded;
     }
+
 }

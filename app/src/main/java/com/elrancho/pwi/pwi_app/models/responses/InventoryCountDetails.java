@@ -8,13 +8,13 @@ public class InventoryCountDetails {
     private Integer vendorItem;
     private String itemDescription;
     private Double cost;
-    private Integer quantity;
+    private Double quantity;
     private String weekEndDate;
     private String  dateUpdated;
     private Boolean itemMaster;
     private String unitOfMeasure;
 
-    public InventoryCountDetails(Integer storeId, Integer departmentId, String userId, Integer vendorItem, Double cost, Integer quantity, String weekEndDate, String  dateUpdated, Boolean itemMaster, String unitOfMeasure) {
+    public InventoryCountDetails(Integer storeId, Integer departmentId, String userId, Integer vendorItem, Double cost, Double quantity, String weekEndDate, String  dateUpdated, Boolean itemMaster, String unitOfMeasure) {
         this.storeId = storeId;
         this.departmentId = departmentId;
         this.userId = userId;
@@ -75,11 +75,11 @@ public class InventoryCountDetails {
         this.cost = cost;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 

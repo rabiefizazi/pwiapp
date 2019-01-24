@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.elrancho.pwi.pwi_app.R;
+import com.elrancho.pwi.pwi_app.shared.Utils;
+
+import java.text.ParseException;
 
 public class FrontActivity extends Activity {
 
@@ -13,6 +16,12 @@ public class FrontActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.front_activity);
+
+        try {
+            long s = Utils.getInstance().getCurrentTimeInMilliseconds();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         Runnable r = new Runnable() {
             @Override
@@ -22,7 +31,7 @@ public class FrontActivity extends Activity {
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 2000);
+        h.postDelayed(r, 1000);
 
     }
 

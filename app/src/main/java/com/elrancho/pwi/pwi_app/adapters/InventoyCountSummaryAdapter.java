@@ -48,7 +48,7 @@ public class InventoyCountSummaryAdapter extends RecyclerView.Adapter<InventoyCo
         holder.parentLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Toast.makeText(mContext, inventoryCountSummariesList.get(position).getWeekEndDate(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(mContext, inventoryCountSummariesList.get(position).getWeekEndDate(), Toast.LENGTH_LONG).show();
 
                 Integer storeId = Integer.parseInt(SharedPrefManagerDepartment.getInstance(mContext).getDepartment().getStoreId());
                 Integer departmentId = Integer.parseInt(SharedPrefManagerDepartment.getInstance(mContext).getDepartment().getDepartmentId());

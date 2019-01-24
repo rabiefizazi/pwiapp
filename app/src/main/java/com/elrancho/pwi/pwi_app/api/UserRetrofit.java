@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UserRetrofit {
 
-    private static final String BASE_URL = "http://ec2-54-163-206-204.compute-1.amazonaws.com:8080/pwi-app-ws/users/";
+    private static final String BASE_URL = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws/users/";
     private static UserRetrofit mInstance;
     private Retrofit retrofit;
 

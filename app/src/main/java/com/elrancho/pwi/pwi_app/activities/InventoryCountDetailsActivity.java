@@ -2,22 +2,26 @@ package com.elrancho.pwi.pwi_app.activities;
 
 
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
 import android.util.ArrayMap;
-import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -27,7 +31,6 @@ import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountDetailsAdapter;
 import com.elrancho.pwi.pwi_app.api.InventoryCountDetailsRetrofit;
 import com.elrancho.pwi.pwi_app.api.ItemRetrofit;
-import com.elrancho.pwi.pwi_app.api.UserRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetailsResponse;
 import com.elrancho.pwi.pwi_app.models.responses.Item;
@@ -55,6 +58,7 @@ import com.symbol.emdk.barcode.StatusData;
 
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,7 +71,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class InventoryCountDetailsActivity extends AppCompatActivity implements EMDKListener, DataListener, StatusListener, ScannerConnectionListener {
+public class InventoryCountDetailsActivity extends AppCompatActivity implements EMDKListener, DataListener, StatusListener, ScannerConnectionListener, View.OnClickListener {
 
     //vars for the InventoryCountDetails Retrofit call
     private RecyclerView recyclerView;
@@ -96,6 +100,8 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     AlertDialog enterQuantityDialog;
     AlertDialog addNewItemDialog;
 
+    AlertDialog manualItemSearchDialog;
+
     TextView etWeekEndDate;
 
     private String token, storeId, departmentId, weekEndDate;
@@ -113,8 +119,13 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         vInventoryCountDetailsForm = findViewById(R.id.content_layout);
         vProgressBar = findViewById(R.id.inventory_count_details_progress);
 
-        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId())%1000;
-        getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Week "+weekEndDate);
+        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId()) % 1000;
+
+        String last3digits = departmentId.substring(4);
+        String departmentName=Utils.getInstance().convertToDepartmentName(last3digits);
+
+
+        getSupportActionBar().setTitle( + storeIdTitle + " | "+departmentName+" | "+weekEndDate);
 
         retrofitCallInventoryCountDetails();
 
@@ -163,6 +174,8 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     //Item Retrofit Call
     public void retrofitCallItemDetails(String vendorItem) {
 
+        isInventoryCountExist = false;
+
         final String scannedVendorItem = vendorItem;
 
         recyclerView = findViewById(R.id.inventory_count_details_recyclerview);
@@ -184,7 +197,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                     addNewItemDialog.dismiss();
                 //******
 
-                final Integer storeId, itemUpc, vendorItem;
+                final long storeId, itemUpc, vendorItem;
                 String itemDescription, unitOfMeasure;
                 Double itemCost;
                 boolean itemMaster;
@@ -221,7 +234,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                     final TextView etItemCost = quantityDialog.findViewById(R.id.item_cost);
                     final TextView etUnitOfMeasure = quantityDialog.findViewById(R.id.unit_of_measure);
                     etItemDescription.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getDescription());
-                    etVendorItem.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getVendorItem().toString());
+                    etVendorItem.setText(Long.toString(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getVendorItem()));
                     etItemCost.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getCost().toString());
                     etUnitOfMeasure.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getUnitOfMeasure());
 
@@ -255,7 +268,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                     etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                         @Override
                         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                            retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity);
+                            retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
                             enterQuantityDialog.dismiss();
                             return false;
                         }
@@ -266,7 +279,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                             .setView(quantityDialog)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity);
+                                    retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
                                 }
                             })
                             .setNegativeButton("Cancel", null).create();
@@ -386,7 +399,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         });
     }
 
-    public void retrofitCallInventoryCountDetailAddUpdate(TextView etVendorItem, TextView etItemDescription, TextView etItemCost, TextView etQuantity) {
+    public void retrofitCallInventoryCountDetailAddUpdate(TextView etVendorItem, TextView etItemDescription, TextView etItemCost, TextView etQuantity, TextView etUnitOfMeasure) {
 
 
         // Build the Json Request
@@ -399,6 +412,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         jsonParams.put("cost", etItemCost.getText().toString());
         jsonParams.put("quantity", etQuantity.getText().toString());
         jsonParams.put("itemMaster", "true");
+        jsonParams.put("unitOfMeasure",etUnitOfMeasure.getText().toString());
 
         RequestBody inventoryCount = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
@@ -803,6 +817,99 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         }
     }
 
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_settings_inventory_details_activity, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.manualItemSearch) {
+
+            LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
+            final View quantityDialog = inflater.inflate(R.layout.manual_item_search_activity, null);
+            final EditText etVendorItem = quantityDialog.findViewById(R.id.etVendorItem);
+
+            manualItemSearchDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
+                    .setTitle("Item search")
+                    .setView(quantityDialog)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
+                            try {
+                                if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate()))
+                                    retrofitCallItemDetails(etVendorItem.getText().toString());
+                                else {
+                                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                                    alertDialogBuilder.setTitle("Week closed!");
+                                    alertDialogBuilder.setMessage("The selected week is closed. Scanning is allowed for the current week only.");
+                                    alertDialogBuilder.setPositiveButton("OK", null);
+                                    AlertDialog alertDialog = alertDialogBuilder.create();
+                                    alertDialog.show();
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", null).create();
+            manualItemSearchDialog.show();
+
+            return true;
+        }
+        if (item.getItemId() == R.id.downloadInventoryFile) {
+
+            String storeId= SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getStoreId().toString();
+            String token= SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getToken();
+            token = token.replace("Bearer ", "");
+            String departmentId = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getDepartmentId().toString();
+            String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
+
+            String url = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws/inventorycounts/totalInventory/"
+                    +storeId+"/"+departmentId+"/"+weekEndDate+"/"+"inventory.csv?token="+token; // missing 'http://' will cause crashed
+            Uri uri = Uri.parse(url);
+            DownloadManager downloadManager = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+            request.setAllowedOverRoaming(false);//Set whether this download may proceed over a roaming connection.
+            request.setTitle("inventory.csv");//Set the title of this download, to be displayed in notifications (if enabled).
+            request.setDescription("Downloading File");//Set a description of this download, to be displayed in notifications (if enabled)
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "inventoryCount.csv");//Set the local destination for the downloaded file to a path within the application's external files directory
+
+
+            Long downloadReference = downloadManager.enqueue(request);//Enqueue a new download and same the referenceId
+            Toast.makeText(InventoryCountDetailsActivity.this, "File downloaded!", Toast.LENGTH_LONG).show();
+//               Code to send the inventory file as attachment in email --> is not working right now because the email app on the scanner doesn't allow attaching files other than pictures and videos.
+                /*Intent intentSendEmail = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","r.fizazi@elranchoinc.com", null));
+                intentSendEmail.putExtra(Intent.EXTRA_SUBJECT, "Testing");
+                intentSendEmail.putExtra(Intent.EXTRA_TEXT, "Testing message");
+                intentSendEmail.putExtra(Intent.EXTRA_STREAM, "/storage/sdcard0/Download/InventoryCount.csv");
+                intentSendEmail.setType("text/html");
+                startActivity(intentSendEmail.createChooser(intentSendEmail, "Choose an Email client :"));*/
+
+            return true;
+        }
+        if (item.getItemId() == R.id.logout) {
+            SharedPrefManager.getInstance(this).clear();
+            //finish();
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     private class AsyncDataUpdate extends AsyncTask<String, Void, String> {
 
@@ -816,15 +923,19 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
             //allow scanning only if the selected week is the current week
             String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
-            if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate()))
-                retrofitCallItemDetails(result);
-            else {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
-                alertDialogBuilder.setTitle("Week closed!");
-                alertDialogBuilder.setMessage("The selected week is closed. Scanning is allowed for the current week only.");
-                alertDialogBuilder.setPositiveButton("OK", null);
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
+            try {
+                if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate()))
+                    retrofitCallItemDetails(result);
+                else {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                    alertDialogBuilder.setTitle("Week closed!");
+                    alertDialogBuilder.setMessage("The selected week is closed. Scanning is allowed for the current week only.");
+                    alertDialogBuilder.setPositiveButton("OK", null);
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -895,7 +1006,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 progressBarVisibility.showProgress(false);
-                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etDescription, etItemCost, etQuantity);
+                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etDescription, etItemCost, etQuantity, etUnitOfMeasure);
             }
 
             @Override

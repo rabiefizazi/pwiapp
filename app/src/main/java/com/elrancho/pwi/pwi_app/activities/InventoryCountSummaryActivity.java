@@ -1,5 +1,6 @@
 package com.elrancho.pwi.pwi_app.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerDepartment;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -63,45 +65,29 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
         vInventoryCountSummaryForm = findViewById(R.id.content_layout);
         vProgressBar = findViewById(R.id.inventory_count_summary_progress);
 
-        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId())%1000;
+
         String last3digits = departmentId.substring(4);
-        switch (last3digits) {
-            case "108":
-                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Dairy");
-                break;
-            case "200":
-                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Meat");
-                break;
-            case "300":
-                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Seafood");
-                break;
-            case "400":
-                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Produce");
-                break;
-            case "500":
-                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Bakery");
-                break;
-            case "501":
-                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Cake");
-                break;
-            case "600":
-                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Kitchen");
-                break;
-            case "700":
-                getSupportActionBar().setTitle("Store "+storeIdTitle+"\\ Tortilleria");
-                break;
-        }
+
+        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId()) % 1000;
+
+        String departmentName=Utils.getInstance().convertToDepartmentName(last3digits);
+
+        getSupportActionBar().setTitle("Store " + storeIdTitle + " | "+departmentName);
 
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveSelectedWeekInfo(Integer.parseInt(SharedPrefManagerDepartment.getInstance(InventoryCountSummaryActivity.this).getDepartment().getStoreId()),
-                        Integer.parseInt(SharedPrefManagerDepartment.getInstance(InventoryCountSummaryActivity.this).getDepartment().getDepartmentId()),
-                        Utils.getInstance().getCurrentWeekEndDate(),
-                        0.00,
-                        0
-                );
+                try {
+                    saveSelectedWeekInfo(Integer.parseInt(SharedPrefManagerDepartment.getInstance(InventoryCountSummaryActivity.this).getDepartment().getStoreId()),
+                            Integer.parseInt(SharedPrefManagerDepartment.getInstance(InventoryCountSummaryActivity.this).getDepartment().getDepartmentId()),
+                            Utils.getInstance().getCurrentWeekEndDate(),
+                            0.00,
+                            0
+                    );
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -138,8 +124,12 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
                 recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountSummaryActivity.this));
 
                 //disable fab button if the current week is already created
-                if (inventoryCountSummaries.size() > 0 && Utils.getInstance().getCurrentWeekEndDate().equals(inventoryCountSummaries.get(0).getWeekEndDate()))
-                    fab.setEnabled(false);
+                try {
+                    if (inventoryCountSummaries.size() > 0 && Utils.getInstance().getCurrentWeekEndDate().equals(inventoryCountSummaries.get(0).getWeekEndDate()))
+                        fab.setVisibility(View.INVISIBLE);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

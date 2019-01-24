@@ -22,7 +22,6 @@ public interface InventoryCountDetailsApi {
             @Path("weekEndDate") String weekEndDate
     );
 
-
     @GET("{storeId}/{departmentId}/{vendorItem}/{weekEndDate}")
     Call<InventoryCountDetailsResponse> getInventoryCountDetail(
             @Header("Authorization") String token,

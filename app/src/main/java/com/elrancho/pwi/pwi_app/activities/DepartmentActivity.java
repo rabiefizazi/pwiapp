@@ -1,7 +1,10 @@
 package com.elrancho.pwi.pwi_app.activities;
 
+import android.app.DownloadManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;

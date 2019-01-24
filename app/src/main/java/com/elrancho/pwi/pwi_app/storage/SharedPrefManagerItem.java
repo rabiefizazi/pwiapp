@@ -30,9 +30,9 @@ public class SharedPrefManagerItem {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putInt("storeId", item.getStoreId());
-        editor.putInt("itemUpc", item.getItemUPC());
-        editor.putInt("vendorItem", item.getVendorItem());
+        editor.putLong("storeId", item.getStoreId());
+        editor.putLong("itemUpc", item.getItemUPC());
+        editor.putLong("vendorItem", item.getVendorItem());
         editor.putString("itemDesctription", item.getDescription());
         editor.putLong("cost", Double.doubleToRawLongBits(item.getCost()));
         editor.putString("unitOfMeasure", item.getUnitOfMeasure());
@@ -46,9 +46,9 @@ public class SharedPrefManagerItem {
 
         return new Item(
 
-                sharedPreferences.getInt("itemUpc", -1),
-                sharedPreferences.getInt("vendorItem", -1),
-                sharedPreferences.getInt("storeId", -1),
+                sharedPreferences.getLong("itemUpc", -1),
+                sharedPreferences.getLong("vendorItem", -1),
+                sharedPreferences.getLong("storeId", -1),
                 sharedPreferences.getString("itemDesctription", null),
                 null,
                 Double.longBitsToDouble(sharedPreferences.getLong("cost", -1)),
