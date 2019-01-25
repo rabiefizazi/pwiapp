@@ -23,15 +23,16 @@ public class Utils {
 
     public String getCurrentWeekEndDate() throws ParseException {
 
-        // Current time
-        double currentTime = getCurrentTimeInMilliseconds();
+        // Current time of midnight of the current day
+        // 7:00 am = 46800000 in milliseconds
+        long currentTime = getCurrentTimeInMilliseconds();
 
         Calendar calendar = GregorianCalendar.getInstance(Locale.US);
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
 //        add this condition to allow the managers to do inventory on Sunday as well. this condition should dbe removed if the they decided to close inventory by Saturday midnight.
-        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ) {
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY && currentTime<46800000 ) {
             calendar.add(calendar.DATE, -1);
         } else {
             calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
@@ -46,15 +47,9 @@ public class Utils {
 
     public long getCurrentTimeInMilliseconds() throws ParseException {
 
-        String currentDate = DateFormat.getInstance().format(new Date());
 
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yy hh:mm a", Locale.US);
-
-        Date now = formatter.parse(currentDate);
-
-        long returnValue = now.getTime();
-
-        return returnValue;
+        long millis = System.currentTimeMillis() % 86400000;
+        return millis;
     }
 
     public String convertToDepartmentName(String department) {

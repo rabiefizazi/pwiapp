@@ -106,6 +106,10 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
     private String token, storeId, departmentId, weekEndDate;
 
+    // Properties that make the activity title
+    int storeIdTitle;
+    String departmentName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,10 +123,10 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         vInventoryCountDetailsForm = findViewById(R.id.content_layout);
         vProgressBar = findViewById(R.id.inventory_count_details_progress);
 
-        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId()) % 1000;
+        storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId()) % 1000;
 
         String last3digits = departmentId.substring(4);
-        String departmentName=Utils.getInstance().convertToDepartmentName(last3digits);
+        departmentName=Utils.getInstance().convertToDepartmentName(last3digits);
 
 
         getSupportActionBar().setTitle( + storeIdTitle + " | "+departmentName+" | "+weekEndDate);
@@ -137,11 +141,13 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
         recyclerView = findViewById(R.id.inventory_count_details_recyclerview);
 
+        progressBarVisibility = new ProgressBarVisibility(this, vInventoryCountDetailsForm, vProgressBar);
+        progressBarVisibility.showProgress(true);
+
         Call<InventoryCountDetailsResponse> call = InventoryCountDetailsRetrofit
                 .getInstance().getInventoryCountDetailsApi().getInventoryCountDetails(token, storeId, departmentId, weekEndDate);
 
-        progressBarVisibility = new ProgressBarVisibility(this, vInventoryCountDetailsForm, vProgressBar);
-        progressBarVisibility.showProgress(true);
+
 
         call.enqueue(new Callback<InventoryCountDetailsResponse>() {
             @Override
@@ -180,10 +186,10 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
         recyclerView = findViewById(R.id.inventory_count_details_recyclerview);
 
-        Call<ItemResponse> call = ItemRetrofit.getInstance().getItemApi().getItem(token, storeId, scannedVendorItem);
-
         progressBarVisibility = new ProgressBarVisibility(this, vInventoryCountDetailsForm, vProgressBar);
         progressBarVisibility.showProgress(true);
+
+        Call<ItemResponse> call = ItemRetrofit.getInstance().getItemApi().getItem(token, storeId, scannedVendorItem);
 
         call.enqueue(new Callback<ItemResponse>() {
             @Override
@@ -293,7 +299,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                     alertDialogBuilder.setTitle("Item Not found!");
                     //commented line below replaced with the line below it to block the adding new item function
                     //alertDialogBuilder.setMessage("item " + scannedVendorItem + " not found in the item master. Would you like to added?");
-                    alertDialogBuilder.setMessage("item " + scannedVendorItem + " not found in the item master.2");
+                    alertDialogBuilder.setMessage("item " + scannedVendorItem + " not found in the item master.");
 //                    alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 //                        @Override
 //                        public void onClick(DialogInterface dialog, int which) {
@@ -416,6 +422,9 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
         RequestBody inventoryCount = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
+        progressBarVisibility = new ProgressBarVisibility(InventoryCountDetailsActivity.this, vInventoryCountDetailsForm, vProgressBar);
+        progressBarVisibility.showProgress(true);
+
         Call<ResponseBody> call;
         if (isInventoryCountExist == false)
             call = InventoryCountDetailsRetrofit.getInstance()
@@ -425,9 +434,6 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             call = InventoryCountDetailsRetrofit.getInstance()
                     .getInventoryCountDetailsApi().updateInventoryCountDetail(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser()
                             .getToken(), inventoryCount);
-
-        progressBarVisibility = new ProgressBarVisibility(InventoryCountDetailsActivity.this, vInventoryCountDetailsForm, vProgressBar);
-        progressBarVisibility.showProgress(true);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -833,12 +839,49 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         if (item.getItemId() == R.id.manualItemSearch) {
 
             LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
-            final View quantityDialog = inflater.inflate(R.layout.manual_item_search_activity, null);
-            final EditText etVendorItem = quantityDialog.findViewById(R.id.etVendorItem);
+            final View manualItemSearch = inflater.inflate(R.layout.manual_item_search_activity, null);
+            final EditText etVendorItem = manualItemSearch.findViewById(R.id.etVendorItem);
+
+            etVendorItem.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    etVendorItem.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                            inputMethodManager.showSoftInput(etVendorItem, InputMethodManager.SHOW_IMPLICIT);
+                        }
+                    });
+                }
+            });
+
+            etVendorItem.requestFocus();
+            etVendorItem.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
+                    try {
+                        if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate()))
+                            retrofitCallItemDetails(etVendorItem.getText().toString());
+                        else {
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                            alertDialogBuilder.setTitle("Week closed!");
+                            alertDialogBuilder.setMessage("The selected week is closed. Scanning is allowed for the current week only.");
+                            alertDialogBuilder.setPositiveButton("OK", null);
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            alertDialog.show();
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    manualItemSearchDialog.dismiss();
+                    return false;
+                }
+            });
 
             manualItemSearchDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
                     .setTitle("Item search")
-                    .setView(quantityDialog)
+                    .setView(manualItemSearch)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
@@ -878,7 +921,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             DownloadManager.Request request = new DownloadManager.Request(uri);
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
             request.setAllowedOverRoaming(false);//Set whether this download may proceed over a roaming connection.
-            request.setTitle("inventory.csv");//Set the title of this download, to be displayed in notifications (if enabled).
+            request.setTitle("inventory_"+departmentName+"_"+weekEndDate+".csv");//Set the title of this download, to be displayed in notifications (if enabled).
             request.setDescription("Downloading File");//Set a description of this download, to be displayed in notifications (if enabled)
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -887,6 +930,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
             Long downloadReference = downloadManager.enqueue(request);//Enqueue a new download and same the referenceId
             Toast.makeText(InventoryCountDetailsActivity.this, "File downloaded!", Toast.LENGTH_LONG).show();
+
 //               Code to send the inventory file as attachment in email --> is not working right now because the email app on the scanner doesn't allow attaching files other than pictures and videos.
                 /*Intent intentSendEmail = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","r.fizazi@elranchoinc.com", null));
                 intentSendEmail.putExtra(Intent.EXTRA_SUBJECT, "Testing");
@@ -994,11 +1038,10 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
         RequestBody newItem = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
-
-        Call<ResponseBody> call = ItemRetrofit.getInstance().getItemApi().createItem(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getToken(), newItem);
-
         progressBarVisibility = new ProgressBarVisibility(InventoryCountDetailsActivity.this, vInventoryCountDetailsForm, vProgressBar);
         progressBarVisibility.showProgress(true);
+
+        Call<ResponseBody> call = ItemRetrofit.getInstance().getItemApi().createItem(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getToken(), newItem);
 
         call.enqueue(new Callback<ResponseBody>() {
 

@@ -66,10 +66,10 @@ public class ResetPasswordActivity extends AppCompatActivity implements View.OnC
 
         RequestBody passwordResetRequest = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
-        Call<PasswordResetRequest> call = UserRetrofit.getInstance().getUserApi().passwordResetRequest(passwordResetRequest);
-
         final ProgressBarVisibility progressBarVisibility = new ProgressBarVisibility(this, vPasswordResetForm, vProgressBar);
         progressBarVisibility.showProgress(true);
+
+        Call<PasswordResetRequest> call = UserRetrofit.getInstance().getUserApi().passwordResetRequest(passwordResetRequest);
 
         call.enqueue(new Callback<PasswordResetRequest>() {
             @Override

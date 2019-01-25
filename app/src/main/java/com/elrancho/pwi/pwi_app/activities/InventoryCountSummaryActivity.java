@@ -1,6 +1,5 @@
 package com.elrancho.pwi.pwi_app.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,8 +9,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountSummaryAdapter;
@@ -29,7 +28,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import okhttp3.internal.Util;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -100,36 +98,47 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
 
         recyclerView = findViewById(R.id.inventory_count_summary_recyclerview);
 
-        Call<InventoryCountSummaryResponse> call = InventoryCountSummaryRetrofit
-                .getInstance().getInventoryCountSummaryApi().getInventoryCountSummary(token, storeId, departmentId);
-
         progressBarVisibility = new ProgressBarVisibility(this, vInventoryCountSummaryForm, vProgressBar);
         progressBarVisibility.showProgress(true);
+
+        Call<InventoryCountSummaryResponse> call = InventoryCountSummaryRetrofit
+                .getInstance().getInventoryCountSummaryApi().getInventoryCountSummary(token, storeId, departmentId);
 
         call.enqueue(new Callback<InventoryCountSummaryResponse>() {
             @Override
             public void onResponse(Call<InventoryCountSummaryResponse> call, Response<InventoryCountSummaryResponse> response) {
                 progressBarVisibility.showProgress(false);
 
-                inventoryCountSummaries = response.body().getInventoryCountSummaries();
-                Collections.sort(inventoryCountSummaries, new Comparator<InventoryCountSummary>() {
-                    @Override
-                    public int compare(InventoryCountSummary o1, InventoryCountSummary o2) {
-                        return o2.getWeekEndDate().compareTo(o1.getWeekEndDate());
+                if (response.code() == 200) {inventoryCountSummaries = response.body().getInventoryCountSummaries();
+                    Collections.sort(inventoryCountSummaries, new Comparator<InventoryCountSummary>() {
+                        @Override
+                        public int compare(InventoryCountSummary o1, InventoryCountSummary o2) {
+                            return o2.getWeekEndDate().compareTo(o1.getWeekEndDate());
+                        }
+
+                    });
+                    inventoyCountSummaryAdapter = new InventoyCountSummaryAdapter(InventoryCountSummaryActivity.this, inventoryCountSummaries);
+                    recyclerView.setAdapter(inventoyCountSummaryAdapter);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountSummaryActivity.this));
+
+                    //disable fab button if the current week is already created
+                    try {
+                        if (inventoryCountSummaries.size() > 0 && Utils.getInstance().getCurrentWeekEndDate().equals(inventoryCountSummaries.get(0).getWeekEndDate()))
+                            fab.setVisibility(View.INVISIBLE);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
-
-                });
-                inventoyCountSummaryAdapter = new InventoyCountSummaryAdapter(InventoryCountSummaryActivity.this, inventoryCountSummaries);
-                recyclerView.setAdapter(inventoyCountSummaryAdapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountSummaryActivity.this));
-
-                //disable fab button if the current week is already created
-                try {
-                    if (inventoryCountSummaries.size() > 0 && Utils.getInstance().getCurrentWeekEndDate().equals(inventoryCountSummaries.get(0).getWeekEndDate()))
-                        fab.setVisibility(View.INVISIBLE);
-                } catch (ParseException e) {
-                    e.printStackTrace();
                 }
+                if(response.code()==500){
+                    SharedPrefManager.getInstance(InventoryCountSummaryActivity.this).clear();
+                    //finish();
+                    Intent intent = new Intent(InventoryCountSummaryActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+
+                    Toast.makeText(InventoryCountSummaryActivity.this, "Your session has expired", Toast.LENGTH_SHORT).show();
+                }
+
             }
 
             @Override
@@ -148,7 +157,7 @@ public class InventoryCountSummaryActivity extends AppCompatActivity /*implement
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_settings) {
+        if (item.getItemId() == R.id.sign_out) {
             SharedPrefManager.getInstance(this).clear();
             //finish();
             Intent intent = new Intent(this, LoginActivity.class);

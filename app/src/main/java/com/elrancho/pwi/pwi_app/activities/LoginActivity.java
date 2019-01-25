@@ -162,11 +162,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         RequestBody userLogin = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
-        Call<ResponseBody> call = UserRetrofit.getInstance().getUserApi().userLogin(userLogin);
-
-
         progressBarVisibility = new ProgressBarVisibility(this, vLoginForm, vProgressBar);
         progressBarVisibility.showProgress(true);
+
+        Call<ResponseBody> call = UserRetrofit.getInstance().getUserApi().userLogin(userLogin);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override

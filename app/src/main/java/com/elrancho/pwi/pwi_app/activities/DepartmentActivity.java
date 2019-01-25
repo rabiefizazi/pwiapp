@@ -1,10 +1,7 @@
 package com.elrancho.pwi.pwi_app.activities;
 
-import android.app.DownloadManager;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,7 +46,7 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_settings) {
+        if (item.getItemId() == R.id.sign_out) {
             SharedPrefManager.getInstance(this).clear();
             //finish();
             Intent intent = new Intent(this, LoginActivity.class);

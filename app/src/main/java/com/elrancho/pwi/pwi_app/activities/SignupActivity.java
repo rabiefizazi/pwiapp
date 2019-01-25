@@ -214,11 +214,10 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
         RequestBody newUser = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
-
-        Call<ResponseBody> call = UserRetrofit.getInstance().getUserApi().createUser(newUser);
-
         progressBarVisibility = new ProgressBarVisibility(this, vSignupForm, vProgressBar);
         progressBarVisibility.showProgress(true);
+
+        Call<ResponseBody> call = UserRetrofit.getInstance().getUserApi().createUser(newUser);
 
         call.enqueue(new Callback<ResponseBody>() {
 
