@@ -44,7 +44,7 @@ public class InventoyCountSummaryAdapter extends RecyclerView.Adapter<InventoyCo
         //InventoryCountSummary inventoryCountSummary = inventoryCountSummariesList.get(position);
 
         holder.tvWeekEndDate.setText(inventoryCountSummariesList.get(position).getWeekEndDate());
-        holder.tvInventoryCountSummary.setText(Double.toString(inventoryCountSummariesList.get(position).getTotalInventory()));
+        holder.tvInventoryCountSummary.setText("$"+String.format("%,.2f", inventoryCountSummariesList.get(position).getTotalInventory()));
         holder.parentLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
