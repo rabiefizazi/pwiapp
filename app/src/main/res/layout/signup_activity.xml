@@ -70,7 +70,7 @@
             android:inputType="textEmailAddress"
             android:maxLines="1"
             android:singleLine="true"
-            android:text="smanager99@elranchoinc.com"
+            android:text=""
             android:textColor="@color/Moccasin" />
 
         <AutoCompleteTextView
@@ -84,7 +84,7 @@
             android:inputType="textEmailAddress"
             android:maxLines="1"
             android:singleLine="true"
-            android:text="smanager98"
+            android:text=""
             android:textColor="@color/Moccasin"/>
 
         <RelativeLayout
@@ -104,7 +104,7 @@
                 android:inputType="textPassword"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="smsmsm"
+                android:text=""
                 android:textColor="@color/Moccasin"/>
 
             <cyd.awesome.material.AwesomeText

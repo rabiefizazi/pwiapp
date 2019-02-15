@@ -13,18 +13,21 @@ public class InventoryCountDetails {
     private String  dateUpdated;
     private Boolean itemMaster;
     private String unitOfMeasure;
+    private Double totalAmount;
 
-    public InventoryCountDetails(Integer storeId, Integer departmentId, String userId, Integer vendorItem, Double cost, Double quantity, String weekEndDate, String  dateUpdated, Boolean itemMaster, String unitOfMeasure) {
+    public InventoryCountDetails(Integer storeId, Integer departmentId, String userId, Integer vendorItem, String itemDescription, Double cost, Double quantity, String weekEndDate, String dateUpdated, Boolean itemMaster, String unitOfMeasure, Double totalAmount) {
         this.storeId = storeId;
         this.departmentId = departmentId;
         this.userId = userId;
         this.vendorItem = vendorItem;
+        this.itemDescription = itemDescription;
         this.cost = cost;
         this.quantity = quantity;
         this.weekEndDate = weekEndDate;
         this.dateUpdated = dateUpdated;
         this.itemMaster = itemMaster;
-        this.unitOfMeasure=unitOfMeasure;
+        this.unitOfMeasure = unitOfMeasure;
+        this.totalAmount = totalAmount;
     }
 
     public Integer getStoreId() {
@@ -91,11 +94,11 @@ public class InventoryCountDetails {
         this.weekEndDate = weekEndDate;
     }
 
-    public String  getDateUpdated() {
+    public String getDateUpdated() {
         return dateUpdated;
     }
 
-    public void setDateUpdated(String  dateUpdated) {
+    public void setDateUpdated(String dateUpdated) {
         this.dateUpdated = dateUpdated;
     }
 
@@ -113,5 +116,13 @@ public class InventoryCountDetails {
 
     public void setUnitOfMeasure(String unitOfMeasure) {
         this.unitOfMeasure = unitOfMeasure;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

@@ -57,8 +57,8 @@ public class Utils {
 
         String returnValue;
         switch (department) {
-            case "108":
-                returnValue = "Dairy";
+            case "202":
+                returnValue = "Cremeria";
                 break;
             case "200":
                 returnValue = "Meat";
@@ -76,7 +76,13 @@ public class Utils {
                 returnValue = "Cake";
                 break;
             case "600":
-                returnValue = "Kitchen";
+                returnValue = "Taqueria";
+                break;
+            case "601":
+                returnValue = "Polleria";
+                break;
+            case "602":
+                returnValue = "Fritura";
                 break;
             case "700":
                 returnValue = "Tortilleria";

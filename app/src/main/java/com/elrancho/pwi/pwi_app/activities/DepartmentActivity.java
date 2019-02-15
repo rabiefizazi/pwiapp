@@ -25,12 +25,14 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
 
         findViewById(R.id.bakery_card).setOnClickListener(this);
         findViewById(R.id.cake_card).setOnClickListener(this);
-        findViewById(R.id.dairy_card).setOnClickListener(this);
+        findViewById(R.id.cremeria_card).setOnClickListener(this);
         findViewById(R.id.kitchen_card).setOnClickListener(this);
         findViewById(R.id.meat_card).setOnClickListener(this);
         findViewById(R.id.produce_card).setOnClickListener(this);
         findViewById(R.id.seafood_card).setOnClickListener(this);
         findViewById(R.id.tortilleria_card).setOnClickListener(this);
+        findViewById(R.id.fritura_card).setOnClickListener(this);
+        findViewById(R.id.polleria_card).setOnClickListener(this);
 
         int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId())%1000;
 
@@ -75,8 +77,8 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
             case R.id.cake_card:
                 getInventorySummary(storeId, storeId.concat("501"));
                 break;
-            case R.id.dairy_card:
-                getInventorySummary(storeId, storeId.concat("108"));
+            case R.id.cremeria_card:
+                getInventorySummary(storeId, storeId.concat("202"));
                 break;
             case R.id.kitchen_card:
                 getInventorySummary(storeId, storeId.concat("600"));
@@ -92,6 +94,12 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.tortilleria_card:
                 getInventorySummary(storeId, storeId.concat("700"));
+                break;
+            case R.id.fritura_card:
+                getInventorySummary(storeId, storeId.concat("602"));
+                break;
+            case R.id.polleria_card:
+                getInventorySummary(storeId, storeId.concat("601"));
                 break;
         }
     }
