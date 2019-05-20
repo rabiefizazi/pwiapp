@@ -9,22 +9,17 @@ import android.util.ArrayMap;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.api.UserRetrofit;
 import com.elrancho.pwi.pwi_app.models.responses.PasswordResetRequest;
-import com.elrancho.pwi.pwi_app.models.responses.User;
 import com.elrancho.pwi.pwi_app.shared.ProgressBarVisibility;
-import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Map;
 
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

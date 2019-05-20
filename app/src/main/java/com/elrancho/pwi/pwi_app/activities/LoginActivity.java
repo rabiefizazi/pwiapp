@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.ArrayMap;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -217,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 alertDialogBuilder.setPositiveButton("OK", null);
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
-
+                Log.d("===", t.getMessage());
 
             }
         });

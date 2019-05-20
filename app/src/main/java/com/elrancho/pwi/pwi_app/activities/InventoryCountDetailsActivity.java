@@ -1,6 +1,7 @@
 package com.elrancho.pwi.pwi_app.activities;
 
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -10,6 +11,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +32,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.elrancho.pwi.pwi_app.BuildConfig;
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountDetailsAdapter;
 import com.elrancho.pwi.pwi_app.api.InventoryCountDetailsRetrofit;
@@ -35,6 +41,7 @@ import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetailsResponse;
 import com.elrancho.pwi.pwi_app.models.responses.Item;
 import com.elrancho.pwi.pwi_app.models.responses.ItemResponse;
+import com.elrancho.pwi.pwi_app.shared.PermissionCheck;
 import com.elrancho.pwi.pwi_app.shared.ProgressBarVisibility;
 import com.elrancho.pwi.pwi_app.shared.Utils;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
@@ -58,6 +65,7 @@ import com.symbol.emdk.barcode.StatusData;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,10 +118,17 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     int storeIdTitle;
     String departmentName;
 
+    // Request WRITE_EXTERNAL_STORAGE permission
+    private static int REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_details_recyclerview);
+
+        // Request WRITE_EXTERNAL_STORAGE permission
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
 
         token = SharedPrefManager.getInstance(this).getUuser().getToken();
         storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
@@ -126,10 +141,10 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId()) % 1000;
 
         String last3digits = departmentId.substring(4);
-        departmentName=Utils.getInstance().convertToDepartmentName(last3digits);
+        departmentName = Utils.getInstance().convertToDepartmentName(last3digits);
 
 
-        getSupportActionBar().setTitle( + storeIdTitle + " | "+departmentName+" | "+weekEndDate);
+        getSupportActionBar().setTitle(+storeIdTitle + " | " + departmentName + " | " + weekEndDate);
 
         retrofitCallInventoryCountDetails();
 
@@ -146,7 +161,6 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
         Call<InventoryCountDetailsResponse> call = InventoryCountDetailsRetrofit
                 .getInstance().getInventoryCountDetailsApi().getInventoryCountDetails(token, storeId, departmentId, weekEndDate);
-
 
 
         call.enqueue(new Callback<InventoryCountDetailsResponse>() {
@@ -245,7 +259,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                     etUnitOfMeasure.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getUnitOfMeasure());
 
                     //populate etQuantity with the actual quantity if the item already exist in the InventoryCount table
-                    etQuantity.setText("0");
+                    etQuantity.setText("");
                     if (inventoryCounts.size() > 0) {
                         Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
                         for (InventoryCountDetails icd : inventoryCountDetailsIterator) {
@@ -418,7 +432,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         jsonParams.put("cost", etItemCost.getText().toString());
         jsonParams.put("quantity", etQuantity.getText().toString());
         jsonParams.put("itemMaster", "true");
-        jsonParams.put("unitOfMeasure",etUnitOfMeasure.getText().toString());
+        jsonParams.put("unitOfMeasure", etUnitOfMeasure.getText().toString());
 
         RequestBody inventoryCount = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
 
@@ -834,6 +848,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         inflater.inflate(R.menu.menu_settings_inventory_details_activity, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.manualItemSearch) {
@@ -906,38 +921,48 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
             return true;
         }
+        //download inventory file
         if (item.getItemId() == R.id.downloadInventoryFile) {
-
-            String storeId= SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getStoreId().toString();
-            String token= SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getToken();
+            String storeId = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getStoreId().toString();
+            String token = SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getToken();
             token = token.replace("Bearer ", "");
             String departmentId = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getDepartmentId().toString();
             String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
 
             String url = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws/inventorycounts/totalInventory/"
-                    +storeId+"/"+departmentId+"/"+weekEndDate+"/"+"inventory.csv?token="+token; // missing 'http://' will cause crashed
+                    + storeId + "/" + departmentId + "/" + weekEndDate + "/" + "inventory.csv?token=" + token; // missing 'http://' will cause crashed
             Uri uri = Uri.parse(url);
-            DownloadManager downloadManager = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
+            DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
             DownloadManager.Request request = new DownloadManager.Request(uri);
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
             request.setAllowedOverRoaming(false);//Set whether this download may proceed over a roaming connection.
-            request.setTitle("inventory_"+departmentName+"_"+weekEndDate+".csv");//Set the title of this download, to be displayed in notifications (if enabled).
+
+            //create the downloaded file name
+            String downloadedFileName="inventory_" + storeId + "_" + departmentName + "_" + weekEndDate + "_"+ System.currentTimeMillis() + ".csv";
+
+            request.setTitle(downloadedFileName);//Set the title of this download, to be displayed in notifications (if enabled).
             request.setDescription("Downloading File");//Set a description of this download, to be displayed in notifications (if enabled)
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "inventoryCount.csv");//Set the local destination for the downloaded file to a path within the application's external files directory
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, downloadedFileName);//Set the local destination for the downloaded file to a path within the application's external files directory
 
 
             Long downloadReference = downloadManager.enqueue(request);//Enqueue a new download and same the referenceId
             Toast.makeText(InventoryCountDetailsActivity.this, "File downloaded!", Toast.LENGTH_LONG).show();
 
-//               Code to send the inventory file as attachment in email --> is not working right now because the email app on the scanner doesn't allow attaching files other than pictures and videos.
-                /*Intent intentSendEmail = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","r.fizazi@elranchoinc.com", null));
-                intentSendEmail.putExtra(Intent.EXTRA_SUBJECT, "Testing");
-                intentSendEmail.putExtra(Intent.EXTRA_TEXT, "Testing message");
-                intentSendEmail.putExtra(Intent.EXTRA_STREAM, "/storage/sdcard0/Download/InventoryCount.csv");
-                intentSendEmail.setType("text/html");
-                startActivity(intentSendEmail.createChooser(intentSendEmail, "Choose an Email client :"));*/
+            // Get the downloaded file URI and attached to the email
+            File pngDir = new File(Environment.getExternalStorageDirectory(),"download/");
+            File pngfile=new File(pngDir,downloadedFileName);
+            Uri pngUri = FileProvider.getUriForFile(this, "com.elrancho.pwi.pwi_app.fileprovider", pngfile);
+
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.setType("text/plain");
+            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,new String[]{});
+            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "inventory_" + storeId + "_" + departmentName + "_" + weekEndDate);
+            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+            emailIntent.putExtra(android.content.Intent.EXTRA_STREAM,pngUri);
+            emailIntent.setType("message/rfc822");
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
 
             return true;
         }
@@ -952,7 +977,6 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 
     private class AsyncDataUpdate extends AsyncTask<String, Void, String> {

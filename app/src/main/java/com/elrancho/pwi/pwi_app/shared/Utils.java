@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -23,16 +22,16 @@ public class Utils {
 
     public String getCurrentWeekEndDate() throws ParseException {
 
-        // Current time of midnight of the current day
-        // 7:00 am = 46800000 in milliseconds
+        // Current time from midnight of the current day
+        // 7:00 am = 46800000 in milliseconds -- always ad 6 hours of milliseconds to get to the time you need
         long currentTime = getCurrentTimeInMilliseconds();
 
         Calendar calendar = GregorianCalendar.getInstance(Locale.US);
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-//        add this condition to allow the managers to do inventory on Sunday as well. this condition should dbe removed if the they decided to close inventory by Saturday midnight.
-        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY && currentTime<46800000 ) {
+//        add this condition to allow the managers to do inventory on Sunday as well. this condition should dbe removed if they decided to close inventory by Saturday midnight.
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY && currentTime<64800000 ) {
             calendar.add(calendar.DATE, -1);
         } else {
             calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);

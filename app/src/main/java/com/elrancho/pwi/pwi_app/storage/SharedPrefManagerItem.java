@@ -3,8 +3,6 @@ package com.elrancho.pwi.pwi_app.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.elrancho.pwi.pwi_app.activities.InventoryCountDetailsActivity;
-import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
 import com.elrancho.pwi.pwi_app.models.responses.Item;
 
 public class SharedPrefManagerItem {

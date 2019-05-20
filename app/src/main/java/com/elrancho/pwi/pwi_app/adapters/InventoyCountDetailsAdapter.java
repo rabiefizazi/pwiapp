@@ -1,7 +1,6 @@
 package com.elrancho.pwi.pwi_app.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,10 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.elrancho.pwi.pwi_app.R;
-import com.elrancho.pwi.pwi_app.activities.InventoryCountDetailsActivity;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
-import com.elrancho.pwi.pwi_app.models.responses.InventoryCountSummary;
-import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
 
 import java.util.List;
 

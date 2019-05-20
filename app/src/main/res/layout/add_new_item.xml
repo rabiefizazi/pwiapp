@@ -131,7 +131,7 @@
                 android:singleLine="true"/>
             <AutoCompleteTextView
                 android:id="@+id/etQuantity"
-                android:layout_width="wrap_content"
+                android:layout_width="125dp"
                 android:layout_height="75dp"
                 android:layout_below="@+id/unit_of_measure"
                 android:layout_alignParentStart="true"
@@ -142,7 +142,7 @@
                 android:inputType="numberDecimal"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textSize="48dp" />
+                android:textSize="32sp" />
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>

@@ -12,47 +12,55 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/iconscanner"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/iconscanner"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <uses-library android:name="com.symbol.emdk" />
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.elrancho.pwi.pwi_app.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/my_paths" />
+        </provider>
+
         <activity
-            android:name=".activities.LoginActivity"
+            android:name="com.elrancho.pwi.pwi_app.activities.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
-            android:name=".activities.SignupActivity"
-            android:parentActivityName=".activities.LoginActivity"/>
+            android:name="com.elrancho.pwi.pwi_app.activities.SignupActivity"
+            android:parentActivityName="com.elrancho.pwi.pwi_app.activities.LoginActivity" />
         <activity
-            android:name=".activities.DepartmentActivity"
+            android:name="com.elrancho.pwi.pwi_app.activities.DepartmentActivity"
             android:label="@string/activity_departments" />
         <activity
-            android:name=".activities.InventoryCountSummaryActivity"
+            android:name="com.elrancho.pwi.pwi_app.activities.InventoryCountSummaryActivity"
             android:label="@string/title_activity_inventory_count_summary"
-            android:parentActivityName=".activities.DepartmentActivity" />
+            android:parentActivityName="com.elrancho.pwi.pwi_app.activities.DepartmentActivity" />
         <activity
-            android:name=".activities.InventoryCountDetailsActivity"
+            android:name="com.elrancho.pwi.pwi_app.activities.InventoryCountDetailsActivity"
             android:label="@string/title_activity_inventory_count_details"
-            android:parentActivityName=".activities.InventoryCountSummaryActivity" />
-        <activity android:name=".activities.FrontActivity">
+            android:parentActivityName="com.elrancho.pwi.pwi_app.activities.InventoryCountSummaryActivity" />
+        <activity android:name="com.elrancho.pwi.pwi_app.activities.FrontActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ResetPasswordActivity"
-            android:parentActivityName=".activities.LoginActivity"/>
+        <activity
+            android:name="com.elrancho.pwi.pwi_app.activities.ResetPasswordActivity"
+            android:parentActivityName="com.elrancho.pwi.pwi_app.activities.LoginActivity" />
     </application>
 
 </manifest>
