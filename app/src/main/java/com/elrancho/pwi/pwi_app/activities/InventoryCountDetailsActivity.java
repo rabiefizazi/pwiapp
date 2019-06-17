@@ -11,9 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,7 +30,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.elrancho.pwi.pwi_app.BuildConfig;
 import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.adapters.InventoyCountDetailsAdapter;
 import com.elrancho.pwi.pwi_app.api.InventoryCountDetailsRetrofit;
@@ -41,7 +38,6 @@ import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetailsResponse;
 import com.elrancho.pwi.pwi_app.models.responses.Item;
 import com.elrancho.pwi.pwi_app.models.responses.ItemResponse;
-import com.elrancho.pwi.pwi_app.shared.PermissionCheck;
 import com.elrancho.pwi.pwi_app.shared.ProgressBarVisibility;
 import com.elrancho.pwi.pwi_app.shared.Utils;
 import com.elrancho.pwi.pwi_app.storage.SharedPrefManager;
@@ -81,6 +77,10 @@ import retrofit2.Response;
 
 public class InventoryCountDetailsActivity extends AppCompatActivity implements EMDKListener, DataListener, StatusListener, ScannerConnectionListener, View.OnClickListener {
 
+
+    private static int REQUEST_CODE=1;
+
+
     //vars for the InventoryCountDetails Retrofit call
     private RecyclerView recyclerView;
     private InventoyCountDetailsAdapter inventoyCountDetailsAdapter;
@@ -118,17 +118,17 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     int storeIdTitle;
     String departmentName;
 
-    // Request WRITE_EXTERNAL_STORAGE permission
-    private static int REQUEST_CODE = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_details_recyclerview);
 
-        // Request WRITE_EXTERNAL_STORAGE permission
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
+
+
+
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        }, REQUEST_CODE);
 
         token = SharedPrefManager.getInstance(this).getUuser().getToken();
         storeId = SharedPrefManagerDepartment.getInstance(this).getDepartment().getStoreId();
@@ -951,10 +951,11 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             Toast.makeText(InventoryCountDetailsActivity.this, "File downloaded!", Toast.LENGTH_LONG).show();
 
             // Get the downloaded file URI and attached to the email
-            File pngDir = new File(Environment.getExternalStorageDirectory(),"download/");
-            File pngfile=new File(pngDir,downloadedFileName);
-            Uri pngUri = FileProvider.getUriForFile(this, "com.elrancho.pwi.pwi_app.fileprovider", pngfile);
+            File downloadFolderPath = new File(Environment.getExternalStorageDirectory(),"download/");
+            File DownloadedInventoryFilePath=new File(downloadFolderPath,downloadedFileName);
+            Uri pngUri = FileProvider.getUriForFile(this, "com.elrancho.pwi.pwi_app.fileprovider", DownloadedInventoryFilePath);
 
+            // Open the email intent
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
             emailIntent.setType("text/plain");
             emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,new String[]{});
@@ -962,7 +963,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
             emailIntent.putExtra(android.content.Intent.EXTRA_STREAM,pngUri);
             emailIntent.setType("message/rfc822");
-            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            startActivity(Intent.createChooser(emailIntent, "Send email..."));
 
             return true;
         }
