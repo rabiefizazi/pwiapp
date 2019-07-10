@@ -33,10 +33,11 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
         findViewById(R.id.tortilleria_card).setOnClickListener(this);
         findViewById(R.id.fritura_card).setOnClickListener(this);
         findViewById(R.id.polleria_card).setOnClickListener(this);
+        findViewById(R.id.palapa_card).setOnClickListener(this);
 
-        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId())%1000;
+        int storeIdTitle = Integer.parseInt(SharedPrefManager.getInstance(this).getUuser().getStoreId()) % 1000;
 
-        getSupportActionBar().setTitle("Store "+storeIdTitle);
+        getSupportActionBar().setTitle("Store " + storeIdTitle);
     }
 
     @Override
@@ -100,6 +101,9 @@ public class DepartmentActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.polleria_card:
                 getInventorySummary(storeId, storeId.concat("601"));
+                break;
+            case R.id.palapa_card:
+                getInventorySummary(storeId, storeId.concat("605"));
                 break;
         }
     }

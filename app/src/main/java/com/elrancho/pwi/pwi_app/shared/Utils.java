@@ -83,6 +83,9 @@ public class Utils {
             case "602":
                 returnValue = "Fritura";
                 break;
+            case "605":
+                returnValue = "Palapa";
+                break;
             case "700":
                 returnValue = "Tortilleria";
                 break;
