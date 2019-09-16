@@ -2,11 +2,13 @@ package com.elrancho.pwi.pwi_app.activities;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,8 +25,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -78,7 +82,7 @@ import retrofit2.Response;
 public class InventoryCountDetailsActivity extends AppCompatActivity implements EMDKListener, DataListener, StatusListener, ScannerConnectionListener, View.OnClickListener {
 
 
-    private static int REQUEST_CODE=1;
+    private static int REQUEST_CODE = 1;
 
 
     //vars for the InventoryCountDetails Retrofit call
@@ -114,16 +118,119 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
     private String token, storeId, departmentId, weekEndDate;
 
+    /************************** Code Enhancement for Version 2 : Begin**************************/
+    // Scanning Areas
+    private Button btnSalesFloor, btnBackroom, btnCooler, btnFreezer, btnSupplies;
+
+    //the booleans have to be initialized with TRUE so that the button background change work properly
+    private boolean isBtnSalesFloorPressed = true, isBtnBackroomPressed = true, isBtnCoolerPressed = true, isBtnFreezerPressed = true, isBtnSuppliesPressed = true;
+    /************************** Code Enhancement for Version 2 : End**************************/
+
     // Properties that make the activity title
     int storeIdTitle;
     String departmentName;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_details_recyclerview);
 
+        /************************** Code Enhancement for Version 2 : Begin**************************/
+        // Scanning Areas
+        btnSalesFloor = findViewById(R.id.btn_sales_floor);
+        btnSalesFloor.setOnClickListener(this);
+        Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSalesFloor, false);
+        btnSalesFloor.setTextColor(getResources().getColor(R.color.DimGray));
 
+        btnSalesFloor.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (isBtnSalesFloorPressed) {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSalesFloor, true);
+                    btnSalesFloor.setTextColor(getResources().getColor(R.color.White));
+                } else {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSalesFloor, false);
+                    btnSalesFloor.setTextColor(getResources().getColor(R.color.DimGray));
+                }
+                return false;
+            }
+        });
+        btnBackroom = findViewById(R.id.btn_backroom);
+        btnBackroom.setOnClickListener(this);
+        Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnBackroom, false);
+        btnBackroom.setTextColor(getResources().getColor(R.color.DimGray));
+
+        btnBackroom.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (isBtnBackroomPressed) {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnBackroom, true);
+                    btnBackroom.setTextColor(getResources().getColor(R.color.White));
+                } else {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnBackroom, false);
+                    btnBackroom.setTextColor(getResources().getColor(R.color.DimGray));
+                }
+                return false;
+            }
+        });
+
+        btnCooler = findViewById(R.id.btn_cooler);
+        btnCooler.setOnClickListener(this);
+        Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnCooler, false);
+        btnCooler.setTextColor(getResources().getColor(R.color.DimGray));
+
+        btnCooler.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (isBtnCoolerPressed) {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnCooler, true);
+                    btnCooler.setTextColor(getResources().getColor(R.color.White));
+                } else {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnCooler, false);
+                    btnCooler.setTextColor(getResources().getColor(R.color.DimGray));
+                }
+                return false;
+            }
+        });
+        btnFreezer = findViewById(R.id.btn_freezer);
+        btnFreezer.setOnClickListener(this);
+        Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnFreezer, false);
+        btnFreezer.setTextColor(getResources().getColor(R.color.DimGray));
+
+        btnFreezer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (isBtnFreezerPressed) {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnFreezer, true);
+                    btnFreezer.setTextColor(getResources().getColor(R.color.White));
+                } else {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnFreezer, false);
+                    btnFreezer.setTextColor(getResources().getColor(R.color.DimGray));
+                }
+                return false;
+            }
+        });
+        btnSupplies = findViewById(R.id.btn_supplies);
+        btnSupplies.setOnClickListener(this);
+        Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSupplies, false);
+        btnSupplies.setTextColor(getResources().getColor(R.color.DimGray));
+
+        btnSupplies.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (isBtnSuppliesPressed) {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSupplies, true);
+                    btnSupplies.setTextColor(getResources().getColor(R.color.White));
+                } else {
+                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSupplies, false);
+                    btnSupplies.setTextColor(getResources().getColor(R.color.DimGray));
+                }
+                return false;
+            }
+        });
+
+        /************************** Code Enhancement for Version 2 : End**************************/
 
 
         ActivityCompat.requestPermissions(this, new String[]{
@@ -837,9 +944,34 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onClick(View v) {
+/************************** Code Enhancement for Version 2 : Begin**************************/
+        switch (v.getId()) {
+            case (R.id.btn_sales_floor):
+                if (isBtnSalesFloorPressed) isBtnSalesFloorPressed = false;
+                else isBtnSalesFloorPressed = true;
+                break;
+            case (R.id.btn_backroom):
+                if (isBtnBackroomPressed) isBtnBackroomPressed = false;
+                else isBtnBackroomPressed = true;
+                break;
+            case (R.id.btn_cooler):
+                if (isBtnCoolerPressed) isBtnCoolerPressed = false;
+                else isBtnCoolerPressed = true;
+                break;
+            case (R.id.btn_freezer):
+                if (isBtnFreezerPressed) isBtnFreezerPressed = false;
+                else isBtnFreezerPressed = true;
+                break;
+            case (R.id.btn_supplies):
+                if (isBtnSuppliesPressed) isBtnSuppliesPressed = false;
+                else isBtnSuppliesPressed = true;
+                break;
 
+/************************** Code Enhancement for Version 2 : End**************************/
+        }
     }
 
     @Override
@@ -938,7 +1070,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             request.setAllowedOverRoaming(false);//Set whether this download may proceed over a roaming connection.
 
             //create the downloaded file name
-            String downloadedFileName="inventory_" + storeId + "_" + departmentName + "_" + weekEndDate + "_"+ System.currentTimeMillis() + ".csv";
+            String downloadedFileName = "inventory_" + storeId + "_" + departmentName + "_" + weekEndDate + "_" + System.currentTimeMillis() + ".csv";
 
             request.setTitle(downloadedFileName);//Set the title of this download, to be displayed in notifications (if enabled).
             request.setDescription("Downloading File");//Set a description of this download, to be displayed in notifications (if enabled)
@@ -951,17 +1083,17 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             Toast.makeText(InventoryCountDetailsActivity.this, "File downloaded!", Toast.LENGTH_LONG).show();
 
             // Get the downloaded file URI and attached to the email
-            File downloadFolderPath = new File(Environment.getExternalStorageDirectory(),"download/");
-            File DownloadedInventoryFilePath=new File(downloadFolderPath,downloadedFileName);
+            File downloadFolderPath = new File(Environment.getExternalStorageDirectory(), "download/");
+            File DownloadedInventoryFilePath = new File(downloadFolderPath, downloadedFileName);
             Uri pngUri = FileProvider.getUriForFile(this, "com.elrancho.pwi.pwi_app.fileprovider", DownloadedInventoryFilePath);
 
             // Open the email intent
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
             emailIntent.setType("text/plain");
-            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,new String[]{});
+            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{});
             emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "inventory_" + storeId + "_" + departmentName + "_" + weekEndDate);
             emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
-            emailIntent.putExtra(android.content.Intent.EXTRA_STREAM,pngUri);
+            emailIntent.putExtra(android.content.Intent.EXTRA_STREAM, pngUri);
             emailIntent.setType("message/rfc822");
             startActivity(Intent.createChooser(emailIntent, "Send email..."));
 

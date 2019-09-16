@@ -1,5 +1,10 @@
 package com.elrancho.pwi.pwi_app.shared;
 
+import android.content.Context;
+import android.widget.Button;
+
+import com.elrancho.pwi.pwi_app.R;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,7 +36,7 @@ public class Utils {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
 //        add this condition to allow the managers to do inventory on Sunday as well. this condition should dbe removed if they decided to close inventory by Saturday midnight.
-        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY && currentTime<64800000 ) {
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY && currentTime < 64800000) {
             calendar.add(calendar.DATE, -1);
         } else {
             calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
@@ -95,5 +100,24 @@ public class Utils {
         }
 
         return returnValue;
+    }
+
+    public void setBtnPressed(Context mContext, Button btn, boolean b) {
+        if (b) {
+            int background = 0;
+            background = R.drawable.btn_along_selected_background;
+
+            //btn.setPressed(true);
+            btn.setBackgroundResource(background);
+            btn.setTextColor(mContext.getResources().getColor(R.color.Black));
+            btn.invalidate();
+        } else {
+            int background = 0;
+            background = R.drawable.btn_along_unselected_background;
+            //btn.setPressed(false);
+            btn.setBackgroundResource(background);
+            btn.setTextColor(mContext.getResources().getColor(R.color.Gray));
+            btn.invalidate();
+        }
     }
 }
