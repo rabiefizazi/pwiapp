@@ -102,7 +102,7 @@
                     android:layout_alignParentTop="true"
                     android:gravity="top"
                     android:text="description/"
-                    android:textSize="18dp" />
+                    android:textSize="13dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -113,41 +113,40 @@
                     android:gravity="bottom"
                     android:text="Vendor Item"
                     android:textAlignment="textEnd"
-                    android:textSize="18dp" />
+                    android:textSize="13dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="105dp"
+                    android:layout_marginStart="85dp"
                     android:layout_marginTop="20dp"
                     android:gravity="bottom"
                     android:text="|"
-                    android:textSize="18dp" />
+                    android:textSize="13dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="115dp"
+                    android:layout_marginStart="95dp"
                     android:layout_marginTop="22dp"
                     android:gravity="center"
                     android:text="Cost"
-                    android:textAlignment="textEnd"
-                    android:textSize="18dp" />
+                    android:textSize="13dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="195dp"
+                    android:layout_marginStart="145dp"
                     android:layout_marginTop="20dp"
                     android:gravity="bottom"
                     android:text="|"
-                    android:textSize="18dp" />
+                    android:textSize="13dp" />
 
 
                 <TextView
@@ -155,36 +154,59 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="205dp"
+                    android:layout_marginStart="155dp"
                     android:layout_marginTop="22dp"
                     android:gravity="center"
                     android:text="Qty"
-                    android:textAlignment="textEnd"
-                    android:textSize="18dp" />
+                    android:textSize="13dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="285dp"
+                    android:layout_marginStart="210dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="30dp"
                     android:gravity="bottom"
                     android:text="|"
-                    android:textSize="18dp" />
+                    android:textSize="13dp" />
+
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="295dp"
+                    android:layout_marginStart="220dp"
                     android:layout_marginTop="22dp"
                     android:gravity="center"
-                    android:text="Unit"
-                    android:textAlignment="textEnd"
-                    android:textSize="18dp" />
+                    android:text="UoM"
+                    android:textSize="13dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="250dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="30dp"
+                    android:gravity="bottom"
+                    android:text="|"
+                    android:textSize="13dp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="260dp"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center"
+                    android:text="Total"
+                    android:textSize="13dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -196,7 +218,7 @@
                     android:gravity="center"
                     android:text="Master?"
                     android:textAlignment="textEnd"
-                    android:textSize="18dp"
+                    android:textSize="13dp"
                     android:visibility="gone" />
             </RelativeLayout>
         </android.support.v7.widget.CardView>

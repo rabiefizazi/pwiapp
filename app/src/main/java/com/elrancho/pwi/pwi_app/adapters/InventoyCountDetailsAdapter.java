@@ -43,6 +43,7 @@ public class InventoyCountDetailsAdapter extends RecyclerView.Adapter<InventoyCo
         holder.tvCost.setText("$"+String.format("%,.2f", inventoryCountsList.get(position).getCost()));
         holder.tvQuantity.setText(inventoryCountsList.get(position).getQuantity().toString());
         holder.tvUnit.setText(inventoryCountsList.get(position).getUnitOfMeasure());
+        holder.tvTotalInventory.setText("$"+String.format("%,.2f", inventoryCountsList.get(position).getTotalAmount()));
 
         //if false change to No, if true change to Yes
         if (inventoryCountsList.get(position).getItemMaster().toString() == "true")
@@ -85,7 +86,7 @@ public class InventoyCountDetailsAdapter extends RecyclerView.Adapter<InventoyCo
 
         RelativeLayout parentLayout;
 
-        TextView tvItemDescription, tvVendorItem, tvCost, tvQuantity, tvUnit, tvIsItemMaster;
+        TextView tvItemDescription, tvVendorItem, tvCost, tvQuantity, tvUnit, tvTotalInventory, tvIsItemMaster;
 
         public InventoryCountDetailsViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -95,6 +96,7 @@ public class InventoyCountDetailsAdapter extends RecyclerView.Adapter<InventoyCo
             tvCost = itemView.findViewById(R.id.item_cost);
             tvQuantity = itemView.findViewById(R.id.quantity);
             tvUnit = itemView.findViewById(R.id.unit);
+            tvTotalInventory = itemView.findViewById(R.id.totalInventory);
             tvIsItemMaster = itemView.findViewById(R.id.is_item_master);
             parentLayout = itemView.findViewById(R.id.content_layout);
         }

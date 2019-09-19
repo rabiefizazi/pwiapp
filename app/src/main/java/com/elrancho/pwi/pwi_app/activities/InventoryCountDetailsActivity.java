@@ -8,7 +8,6 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,8 +17,11 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.ArrayMap;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,6 +29,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -118,13 +122,24 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
     private String token, storeId, departmentId, weekEndDate;
 
-    /************************** Code Enhancement for Version 2 : Begin**************************/
+    /************************** Code Enhancement for phase 2 : Begin**************************/
     // Scanning Areas
     private Button btnSalesFloor, btnBackroom, btnCooler, btnFreezer, btnSupplies;
 
     //the booleans have to be initialized with TRUE so that the button background change work properly
-    private boolean isBtnSalesFloorPressed = true, isBtnBackroomPressed = true, isBtnCoolerPressed = true, isBtnFreezerPressed = true, isBtnSuppliesPressed = true;
-    /************************** Code Enhancement for Version 2 : End**************************/
+    private boolean isBtnSalesFloorPressed = false, isBtnBackroomPressed = false, isBtnCoolerPressed = false, isBtnFreezerPressed = false, isBtnSuppliesPressed = false;
+
+    private boolean addMoreQty = false, modifyQty = false;
+    private double quantityFound = 0;
+
+    private EditText etQuantity;
+    private TextView etItemCost;
+    private TextView tvQuantity;
+
+    private List<InventoryCountDetails> filteredInventoryCounts;
+
+    int forceOneTouch;
+    /************************** Code Enhancement for phase 2 : End**************************/
 
     // Properties that make the activity title
     int storeIdTitle;
@@ -136,101 +151,38 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inventory_count_details_recyclerview);
 
-        /************************** Code Enhancement for Version 2 : Begin**************************/
+        /************************** Code Enhancement for phase 2 : Begin**************************/
+
+        //initialize the filtered inventoryCount list
+        filteredInventoryCounts = new ArrayList<>();
         // Scanning Areas
+        //Salesfloor
         btnSalesFloor = findViewById(R.id.btn_sales_floor);
         btnSalesFloor.setOnClickListener(this);
         Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSalesFloor, false);
         btnSalesFloor.setTextColor(getResources().getColor(R.color.DimGray));
-
-        btnSalesFloor.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (isBtnSalesFloorPressed) {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSalesFloor, true);
-                    btnSalesFloor.setTextColor(getResources().getColor(R.color.White));
-                } else {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSalesFloor, false);
-                    btnSalesFloor.setTextColor(getResources().getColor(R.color.DimGray));
-                }
-                return false;
-            }
-        });
+        //backroom
         btnBackroom = findViewById(R.id.btn_backroom);
         btnBackroom.setOnClickListener(this);
         Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnBackroom, false);
         btnBackroom.setTextColor(getResources().getColor(R.color.DimGray));
-
-        btnBackroom.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (isBtnBackroomPressed) {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnBackroom, true);
-                    btnBackroom.setTextColor(getResources().getColor(R.color.White));
-                } else {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnBackroom, false);
-                    btnBackroom.setTextColor(getResources().getColor(R.color.DimGray));
-                }
-                return false;
-            }
-        });
-
+        //Cooler
         btnCooler = findViewById(R.id.btn_cooler);
         btnCooler.setOnClickListener(this);
         Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnCooler, false);
         btnCooler.setTextColor(getResources().getColor(R.color.DimGray));
-
-        btnCooler.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (isBtnCoolerPressed) {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnCooler, true);
-                    btnCooler.setTextColor(getResources().getColor(R.color.White));
-                } else {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnCooler, false);
-                    btnCooler.setTextColor(getResources().getColor(R.color.DimGray));
-                }
-                return false;
-            }
-        });
+        //Freezer
         btnFreezer = findViewById(R.id.btn_freezer);
         btnFreezer.setOnClickListener(this);
         Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnFreezer, false);
         btnFreezer.setTextColor(getResources().getColor(R.color.DimGray));
-
-        btnFreezer.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (isBtnFreezerPressed) {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnFreezer, true);
-                    btnFreezer.setTextColor(getResources().getColor(R.color.White));
-                } else {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnFreezer, false);
-                    btnFreezer.setTextColor(getResources().getColor(R.color.DimGray));
-                }
-                return false;
-            }
-        });
+        //Supplies
         btnSupplies = findViewById(R.id.btn_supplies);
         btnSupplies.setOnClickListener(this);
         Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSupplies, false);
         btnSupplies.setTextColor(getResources().getColor(R.color.DimGray));
 
-        btnSupplies.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (isBtnSuppliesPressed) {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSupplies, true);
-                    btnSupplies.setTextColor(getResources().getColor(R.color.White));
-                } else {
-                    Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSupplies, false);
-                    btnSupplies.setTextColor(getResources().getColor(R.color.DimGray));
-                }
-                return false;
-            }
-        });
-
-        /************************** Code Enhancement for Version 2 : End**************************/
+        /************************** Code Enhancement for phase 2 : End**************************/
 
 
         ActivityCompat.requestPermissions(this, new String[]{
@@ -322,7 +274,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
                 if (addNewItemDialog != null && addNewItemDialog.isShowing())
                     addNewItemDialog.dismiss();
-                //******
+                //********************************************************************************************************************************
 
                 final long storeId, itemUpc, vendorItem;
                 String itemDescription, unitOfMeasure;
@@ -355,15 +307,22 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                     LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
                     final View quantityDialog = inflater.inflate(R.layout.enter_quantity_activity, null);
 
-                    final EditText etQuantity = quantityDialog.findViewById(R.id.etQuantity);
+                    etQuantity = quantityDialog.findViewById(R.id.etQuantity);
                     final TextView etItemDescription = quantityDialog.findViewById(R.id.item_description);
                     final TextView etVendorItem = quantityDialog.findViewById(R.id.vendorItem);
-                    final TextView etItemCost = quantityDialog.findViewById(R.id.item_cost);
+                    etItemCost = quantityDialog.findViewById(R.id.item_cost);
                     final TextView etUnitOfMeasure = quantityDialog.findViewById(R.id.unit_of_measure);
+
                     etItemDescription.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getDescription());
                     etVendorItem.setText(Long.toString(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getVendorItem()));
                     etItemCost.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getCost().toString());
                     etUnitOfMeasure.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getUnitOfMeasure());
+
+                    /************************** Code Enhancement for phase 2 : Begin**************************/
+                    // adding the unit of measure next to the EditText of the "enter quantity"
+                    final TextView etUnitOfMeasure2 = quantityDialog.findViewById(R.id.unit_of_measure2);
+                    etUnitOfMeasure2.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getUnitOfMeasure());
+                    /************************** Code Enhancement for phase 2 : end****************************/
 
                     //populate etQuantity with the actual quantity if the item already exist in the InventoryCount table
                     etQuantity.setText("");
@@ -378,39 +337,154 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                         }
                     }
 
-                    etQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                        @Override
-                        public void onFocusChange(View v, boolean hasFocus) {
-                            etQuantity.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    inputMethodManager.showSoftInput(etQuantity, InputMethodManager.SHOW_IMPLICIT);
-                                }
-                            });
-                        }
-                    });
+                    /************************** Code Enhancement for phase 2 : begin****************************/
+                    tvQuantity = quantityDialog.findViewById(R.id.tv_quantity);
+                    //if the item has already been scanned
 
-                    etQuantity.requestFocus();
-                    etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                        @Override
-                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                            retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
-                            enterQuantityDialog.dismiss();
-                            return false;
-                        }
-                    });
+                    if (isInventoryCountExist) {
+                        quantityFound = Double.valueOf(etQuantity.getText().toString());
+                        //Assign the quantity to the textView if the item has already been scanned
+                        tvQuantity.setText(String.valueOf(quantityFound));
+                        etItemDescription.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getDescription());
 
-                    enterQuantityDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
-                            .setTitle("Enter Quantity")
-                            .setView(quantityDialog)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
-                                }
-                            })
-                            .setNegativeButton("Cancel", null).create();
-                    enterQuantityDialog.show();
+                        //Add a dialog box to inform the user that this item has already been scanned, and give him the choice to add more or modify the quantity.
+
+                        String tvItemAlreadyScanned = "the item \n" + SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getDescription() +
+                                " \nhas been scanned already \nThe quantity found is " + quantityFound + " \nDo you wan to?";
+
+                        AlertDialog.Builder itemAlreadyScannedAlertDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                        itemAlreadyScannedAlertDialog.setMessage(tvItemAlreadyScanned);
+                        itemAlreadyScannedAlertDialog.setPositiveButton("Modify Qty", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                addMoreQty = false;
+                                modifyQty = true;
+                                etQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                                    @Override
+                                    public void onFocusChange(View v, boolean hasFocus) {
+                                        etQuantity.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                inputMethodManager.showSoftInput(etQuantity, InputMethodManager.SHOW_IMPLICIT);
+                                            }
+                                        });
+                                    }
+                                });
+
+                                etQuantity.requestFocus();
+                                etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                                    @Override
+                                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                        enterQuantityDialog.dismiss();
+                                        return false;
+                                    }
+                                });
+                                //alert the user when he enters quantity that makes the inventory greater that $1000.00
+                                alertUserWhenInventoryIsGreaterThan999();
+
+                                enterQuantityDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
+                                        .setTitle("Modify Quantity")
+                                        .setView(quantityDialog)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", null).create();
+                                enterQuantityDialog.show();
+                            }
+                        });
+                        itemAlreadyScannedAlertDialog.setNegativeButton("Add More Qty", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                etQuantity.setText("0");
+                                addMoreQty = true;
+                                modifyQty = false;
+                                etQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                                    @Override
+                                    public void onFocusChange(View v, boolean hasFocus) {
+                                        etQuantity.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                inputMethodManager.showSoftInput(etQuantity, InputMethodManager.SHOW_IMPLICIT);
+                                            }
+                                        });
+                                    }
+                                });
+
+                                etQuantity.requestFocus();
+                                etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                                    @Override
+                                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                        enterQuantityDialog.dismiss();
+                                        return false;
+                                    }
+                                });
+
+                                //alert the user when he enters quantity that makes the inventory greater that $1000.00
+                                alertUserWhenInventoryIsGreaterThan999();
+                                enterQuantityDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
+                                        .setTitle("Add More Quantity")
+                                        .setView(quantityDialog)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", null).create();
+                                enterQuantityDialog.show();
+                            }
+                        });
+
+                        itemAlreadyScannedAlertDialog.show();
+
+
+                        //if the item has not been scanned yet
+                    } else {
+                        //Assign the quantity to the textView if the item has already been scanned
+                        tvQuantity.setText("0");
+                        etQuantity.setText("0");
+                        etQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                            @Override
+                            public void onFocusChange(View v, boolean hasFocus) {
+                                etQuantity.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        inputMethodManager.showSoftInput(etQuantity, InputMethodManager.SHOW_IMPLICIT);
+                                    }
+                                });
+                            }
+                        });
+
+                        etQuantity.requestFocus();
+                        etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                            @Override
+                            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                enterQuantityDialog.dismiss();
+                                return false;
+                            }
+                        });
+                        //alert the user when he enters quantity that makes the inventory greater that $1000.00
+                        alertUserWhenInventoryIsGreaterThan999();
+                        enterQuantityDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
+                                .setTitle("Enter Quantity")
+                                .setView(quantityDialog)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                    }
+                                })
+                                .setNegativeButton("Cancel", null).create();
+                        enterQuantityDialog.show();
+                    }
+                    /************************** Code Enhancement for phase 2 : end****************************/
+
 
                 }
 
@@ -537,7 +611,13 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         jsonParams.put("vendorItem", etVendorItem.getText().toString());
         jsonParams.put("itemDescription", etItemDescription.getText().toString());
         jsonParams.put("cost", etItemCost.getText().toString());
-        jsonParams.put("quantity", etQuantity.getText().toString());
+        /************************** Code Enhancement for phase 2 : begin****************************/
+        //jsonParams.put("quantity", etQuantity.getText().toString());
+        if (addMoreQty)
+            jsonParams.put("quantity", String.valueOf((Double.valueOf(etQuantity.getText().toString()) + quantityFound)));
+        else
+            jsonParams.put("quantity", etQuantity.getText().toString());
+        /************************** Code Enhancement for phase 2 : end****************************/
         jsonParams.put("itemMaster", "true");
         jsonParams.put("unitOfMeasure", etUnitOfMeasure.getText().toString());
 
@@ -551,6 +631,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             call = InventoryCountDetailsRetrofit.getInstance()
                     .getInventoryCountDetailsApi().createInventoryCountDetail(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser()
                             .getToken(), inventoryCount);
+
         else
             call = InventoryCountDetailsRetrofit.getInstance()
                     .getInventoryCountDetailsApi().updateInventoryCountDetail(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser()
@@ -947,30 +1028,35 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onClick(View v) {
-/************************** Code Enhancement for Version 2 : Begin**************************/
+/************************** Code Enhancement for phase 2 : Begin**************************/
         switch (v.getId()) {
             case (R.id.btn_sales_floor):
                 if (isBtnSalesFloorPressed) isBtnSalesFloorPressed = false;
                 else isBtnSalesFloorPressed = true;
+                filterBasedOnAreaSelected(isBtnSalesFloorPressed, btnSalesFloor, 1);
                 break;
             case (R.id.btn_backroom):
                 if (isBtnBackroomPressed) isBtnBackroomPressed = false;
                 else isBtnBackroomPressed = true;
+                filterBasedOnAreaSelected(isBtnBackroomPressed, btnBackroom, 2);
                 break;
             case (R.id.btn_cooler):
                 if (isBtnCoolerPressed) isBtnCoolerPressed = false;
                 else isBtnCoolerPressed = true;
+                filterBasedOnAreaSelected(isBtnCoolerPressed, btnCooler, 3);
                 break;
             case (R.id.btn_freezer):
                 if (isBtnFreezerPressed) isBtnFreezerPressed = false;
                 else isBtnFreezerPressed = true;
+                filterBasedOnAreaSelected(isBtnFreezerPressed, btnFreezer, 4);
                 break;
             case (R.id.btn_supplies):
                 if (isBtnSuppliesPressed) isBtnSuppliesPressed = false;
                 else isBtnSuppliesPressed = true;
+                filterBasedOnAreaSelected(isBtnSuppliesPressed, btnSupplies, 5);
                 break;
 
-/************************** Code Enhancement for Version 2 : End**************************/
+/************************** Code Enhancement for phase 2 : End**************************/
         }
     }
 
@@ -1223,4 +1309,102 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             }
         });
     }
+
+    /************************** Code Enhancement for phase 2 : Begin**************************/
+    public void alertUserWhenInventoryIsGreaterThan999() {
+        // Concatenate the Quantity text with zero to avoid the app crashes on "Double Invalid '' " error
+        etQuantity.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //adding a leading zero to the etQuantity field to avoid app crashes with error 'invalid double""'
+                String strQuantity = "0" + (etQuantity.getText().toString());
+                double quantity = Double.valueOf(strQuantity);
+
+                //add the quantity found to the new entered quantity
+                if (addMoreQty)
+                    quantity += Double.valueOf(tvQuantity.getText().toString());
+
+                //shake the etquantity editText if the value entered is greater than 999
+                if (quantity * Double.valueOf(etItemCost.getText().toString()) > 1000) {
+                    //change the textColor of the quantity box
+                    etQuantity.setTextColor(getResources().getColor(R.color.Red));
+                    Animation shake = AnimationUtils.loadAnimation(InventoryCountDetailsActivity.this, R.anim.shake);
+                    etQuantity.startAnimation(shake);
+                    Toast toast = Toast.makeText(InventoryCountDetailsActivity.this, "The inventory for this item is greater than $1000.00", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                } else
+                    etQuantity.setTextColor(getResources().getColor(R.color.White));
+            }
+        });
+    }
+
+    //add a filter based on the area selected
+    public void filterBasedOnAreaSelected(boolean isButtonPressed, Button btn, double quantity) {
+        if (isButtonPressed) {
+            //change the background and the text color
+            Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btn, true);
+            btn.setTextColor(getResources().getColor(R.color.White));
+            //add the Supplies area filter
+            Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
+            for (InventoryCountDetails icd : inventoryCountDetailsIterator) {
+                if (icd.getQuantity() == quantity) {
+                    filteredInventoryCounts.add(icd);
+                    Collections.sort(filteredInventoryCounts, new Comparator<InventoryCountDetails>() {
+                        @Override
+                        public int compare(InventoryCountDetails o1, InventoryCountDetails o2) {
+                            if (!o2.getDateUpdated().equals(null))
+                                return o2.getDateUpdated().compareTo(o1.getDateUpdated());
+                            return 0;
+                        }
+
+                    });
+
+                }
+            }
+            inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, filteredInventoryCounts);
+            recyclerView.setAdapter(inventoyCountDetailsAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivity.this));
+        } else {
+
+            Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btn, false);
+            btn.setTextColor(getResources().getColor(R.color.DimGray));
+
+            //remove the inventory when the button is unpressed
+            Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
+            for (InventoryCountDetails icd : inventoryCountDetailsIterator) {
+                if (icd.getQuantity() == quantity) {
+                    filteredInventoryCounts.remove(icd);
+                    Collections.sort(filteredInventoryCounts, new Comparator<InventoryCountDetails>() {
+                        @Override
+                        public int compare(InventoryCountDetails o1, InventoryCountDetails o2) {
+                            if (!o2.getDateUpdated().equals(null))
+                                return o2.getDateUpdated().compareTo(o1.getDateUpdated());
+                            return 0;
+                        }
+
+                    });
+
+                }
+            }
+
+            if (filteredInventoryCounts.size() > 0)
+                inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, filteredInventoryCounts);
+            else
+                inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, inventoryCounts);
+            recyclerView.setAdapter(inventoyCountDetailsAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivity.this));
+        }
+
+        //initial the forceOneTouch variable to zero
+    }
+    /************************** Code Enhancement for phase 2 : End**************************/
 }

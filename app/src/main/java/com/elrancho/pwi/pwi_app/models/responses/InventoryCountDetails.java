@@ -119,7 +119,7 @@ public class InventoryCountDetails {
     }
 
     public Double getTotalAmount() {
-        return totalAmount;
+        return getCost()*getQuantity();
     }
 
     public void setTotalAmount(Double totalAmount) {
