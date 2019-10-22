@@ -18,6 +18,7 @@ import com.elrancho.pwi.pwi_app.storage.SharedPrefManagerInventorySummary;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class InventoyCountSummaryAdapter extends RecyclerView.Adapter<InventoyCountSummaryAdapter.InventoryCountSummaryViewHolder>{
 
@@ -43,7 +44,7 @@ public class InventoyCountSummaryAdapter extends RecyclerView.Adapter<InventoyCo
         //InventoryCountSummary inventoryCountSummary = inventoryCountSummariesList.get(position);
 
         holder.tvWeekEndDate.setText(inventoryCountSummariesList.get(position).getWeekEndDate());
-        holder.tvInventoryCountSummary.setText("$"+String.format("%,.2f", inventoryCountSummariesList.get(position).getTotalInventory()));
+        holder.tvInventoryCountSummary.setText("$".concat(String.format(Locale.US, "%,.2f", inventoryCountSummariesList.get(position).getTotalInventory())));
         holder.parentLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){

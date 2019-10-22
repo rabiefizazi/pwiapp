@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class InventoryCountDetailsRetrofit {
 
-    private static final String BASE_URL = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws/inventorycounts/";
+    private static final String BASE_URL = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws-dev/inventorycounts/";
     private static InventoryCountDetailsRetrofit mInstance;
     private Retrofit retrofit;
 

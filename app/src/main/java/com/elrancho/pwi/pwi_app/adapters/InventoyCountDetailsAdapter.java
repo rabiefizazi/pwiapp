@@ -14,6 +14,7 @@ import com.elrancho.pwi.pwi_app.R;
 import com.elrancho.pwi.pwi_app.models.responses.InventoryCountDetails;
 
 import java.util.List;
+import java.util.Locale;
 
 public class InventoyCountDetailsAdapter extends RecyclerView.Adapter<InventoyCountDetailsAdapter.InventoryCountDetailsViewHolder> {
 
@@ -39,11 +40,11 @@ public class InventoyCountDetailsAdapter extends RecyclerView.Adapter<InventoyCo
         //InventoryCountSummary inventoryCountSummary = inventoryCountSummariesList.get(position);
 
         holder.tvItemDescription.setText(inventoryCountsList.get(position).getItemDescription());
-        holder.tvVendorItem.setText(inventoryCountsList.get(position).getVendorItem().toString());
-        holder.tvCost.setText("$"+String.format("%,.2f", inventoryCountsList.get(position).getCost()));
-        holder.tvQuantity.setText(inventoryCountsList.get(position).getQuantity().toString());
+        holder.tvVendorItem.setText(String.valueOf(inventoryCountsList.get(position).getVendorItem()));
+        holder.tvCost.setText("$".concat(String.format(Locale.US,"%,.2f", inventoryCountsList.get(position).getCost())));
+        holder.tvQuantity.setText(String.valueOf(inventoryCountsList.get(position).getQuantity()));
         holder.tvUnit.setText(inventoryCountsList.get(position).getUnitOfMeasure());
-        holder.tvTotalInventory.setText("$"+String.format("%,.2f", inventoryCountsList.get(position).getTotalAmount()));
+        holder.tvTotalInventory.setText("$".concat(String.format(Locale.US,"%,.2f", inventoryCountsList.get(position).getTotalAmount())));
 
         //if false change to No, if true change to Yes
         if (inventoryCountsList.get(position).getItemMaster().toString() == "true")

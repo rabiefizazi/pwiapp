@@ -4,6 +4,7 @@ public class InventoryCountDetails {
 
     private Integer storeId;
     private Integer departmentId;
+    private Integer areaId;
     private String userId;
     private Integer vendorItem;
     private String itemDescription;
@@ -15,9 +16,10 @@ public class InventoryCountDetails {
     private String unitOfMeasure;
     private Double totalAmount;
 
-    public InventoryCountDetails(Integer storeId, Integer departmentId, String userId, Integer vendorItem, String itemDescription, Double cost, Double quantity, String weekEndDate, String dateUpdated, Boolean itemMaster, String unitOfMeasure, Double totalAmount) {
+    public InventoryCountDetails(Integer storeId, Integer departmentId, Integer areaId, String userId, Integer vendorItem, String itemDescription, Double cost, Double quantity, String weekEndDate, String dateUpdated, Boolean itemMaster, String unitOfMeasure, Double totalAmount) {
         this.storeId = storeId;
         this.departmentId = departmentId;
+        this.areaId=areaId;
         this.userId = userId;
         this.vendorItem = vendorItem;
         this.itemDescription = itemDescription;
@@ -40,6 +42,14 @@ public class InventoryCountDetails {
 
     public Integer getDepartmentId() {
         return departmentId;
+    }
+
+    public void setAreaId(Integer areaId) {
+        this.areaId = areaId;
+    }
+
+    public Integer getAreaId() {
+        return areaId;
     }
 
     public void setDepartmentId(Integer departmentId) {

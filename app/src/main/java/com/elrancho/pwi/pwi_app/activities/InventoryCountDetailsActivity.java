@@ -27,7 +27,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -75,6 +74,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.RequestBody;
@@ -91,7 +91,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
     //vars for the InventoryCountDetails Retrofit call
     private RecyclerView recyclerView;
-    private InventoyCountDetailsAdapter inventoyCountDetailsAdapter;
+    private InventoyCountDetailsAdapter inventoryCountDetailsAdapter;
     private List<InventoryCountDetails> inventoryCounts;
 
     private EMDKManager emdkManager = null;
@@ -138,7 +138,11 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
     private List<InventoryCountDetails> filteredInventoryCounts;
 
-    int forceOneTouch;
+    // for total inventory by the selected areas
+    double totalInventoryBySelectedAreas = 0;
+    TextView textViewInventoryTotalByArea;
+    int manipulatedAreaId = 0, actualAreaId = 0;
+    boolean isAnybuttonselected = false;
     /************************** Code Enhancement for phase 2 : End**************************/
 
     // Properties that make the activity title
@@ -182,6 +186,11 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btnSupplies, false);
         btnSupplies.setTextColor(getResources().getColor(R.color.DimGray));
 
+        textViewInventoryTotalByArea = findViewById(R.id.tv_inventory_total_by_area);
+        if (SharedPrefManagerInventorySummary.getInstance(this).getInventorySummary().getTotalInventory() > 0)
+            textViewInventoryTotalByArea.setText(String.valueOf(SharedPrefManagerInventorySummary.getInstance(this).getInventorySummary().getTotalInventory()));
+        else
+            textViewInventoryTotalByArea.setText("0");
         /************************** Code Enhancement for phase 2 : End**************************/
 
 
@@ -231,15 +240,44 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                 Collections.sort(inventoryCounts, new Comparator<InventoryCountDetails>() {
                     @Override
                     public int compare(InventoryCountDetails o1, InventoryCountDetails o2) {
-                        if (!o2.getDateUpdated().equals(null))
+                        if (o2.getDateUpdated() != null)
                             return o2.getDateUpdated().compareTo(o1.getDateUpdated());
                         return 0;
                     }
 
                 });
-                inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, inventoryCounts);
-                recyclerView.setAdapter(inventoyCountDetailsAdapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivity.this));
+
+                /************************** Code Enhancement for phase 2 : Begin**************************/
+                // If one or more areas are already selected use the filterInventoryCounts, else use inventoryCounts
+                if (actualAreaId != 0) {
+                    Button btnTemp = null;
+                    switch (actualAreaId) {
+                        case 1:
+                            btnTemp = btnSalesFloor;
+                            break;
+                        case 2:
+                            btnTemp = btnBackroom;
+                            break;
+                        case 3:
+                            btnTemp = btnCooler;
+                            break;
+                        case 4:
+                            btnTemp = btnFreezer;
+                            break;
+                        case 5:
+                            btnTemp = btnSupplies;
+                            break;
+                    }
+                    filteredInventoryCounts.clear();
+                    filterBasedOnAreaSelected(true, btnTemp, actualAreaId);
+                }
+                /************************** Code Enhancement for phase 2 : End**************************/
+                else {
+                    inventoryCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, inventoryCounts);
+                    recyclerView.setAdapter(inventoryCountDetailsAdapter);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivity.this));
+                    calculateTotalInventoryByArea(inventoryCounts);
+                }
             }
 
             @Override
@@ -314,8 +352,8 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                     final TextView etUnitOfMeasure = quantityDialog.findViewById(R.id.unit_of_measure);
 
                     etItemDescription.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getDescription());
-                    etVendorItem.setText(Long.toString(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getVendorItem()));
-                    etItemCost.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getCost().toString());
+                    etVendorItem.setText(String.valueOf(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getVendorItem()));
+                    etItemCost.setText(String.valueOf(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getCost()));
                     etUnitOfMeasure.setText(SharedPrefManagerItem.getInstance(InventoryCountDetailsActivity.this).getItem().getUnitOfMeasure());
 
                     /************************** Code Enhancement for phase 2 : Begin**************************/
@@ -330,8 +368,11 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                         Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
                         for (InventoryCountDetails icd : inventoryCountDetailsIterator) {
                             if ((icd.getVendorItem() - vendorItem) == 0) {
-                                etQuantity.setText(icd.getQuantity().toString());
-                                isInventoryCountExist = true;
+                                etQuantity.setText(String.valueOf(icd.getQuantity()));
+                                /************************** Code Enhancement for phase 2 : begin****************************/
+                                if (actualAreaId == icd.getAreaId())
+                                /************************** Code Enhancement for phase 2 : begin****************************/
+                                    isInventoryCountExist = true;
                                 break;
                             }
                         }
@@ -376,7 +417,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                                 etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                                     @Override
                                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure, actualAreaId);
                                         enterQuantityDialog.dismiss();
                                         return false;
                                     }
@@ -389,7 +430,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                                         .setView(quantityDialog)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
-                                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure, actualAreaId);
                                             }
                                         })
                                         .setNegativeButton("Cancel", null).create();
@@ -419,7 +460,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                                 etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                                     @Override
                                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure, actualAreaId);
                                         enterQuantityDialog.dismiss();
                                         return false;
                                     }
@@ -432,7 +473,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                                         .setView(quantityDialog)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
-                                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure, actualAreaId);
                                             }
                                         })
                                         .setNegativeButton("Cancel", null).create();
@@ -465,7 +506,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                         etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                             @Override
                             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure, actualAreaId);
                                 enterQuantityDialog.dismiss();
                                 return false;
                             }
@@ -477,117 +518,21 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                                 .setView(quantityDialog)
                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
-                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure);
+                                        retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure, actualAreaId);
                                     }
                                 })
                                 .setNegativeButton("Cancel", null).create();
                         enterQuantityDialog.show();
                     }
                     /************************** Code Enhancement for phase 2 : end****************************/
-
-
                 }
 
                 if (response.code() == 404) {
 
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
                     alertDialogBuilder.setTitle("Item Not found!");
-                    //commented line below replaced with the line below it to block the adding new item function
-                    //alertDialogBuilder.setMessage("item " + scannedVendorItem + " not found in the item master. Would you like to added?");
                     alertDialogBuilder.setMessage("item " + scannedVendorItem + " not found in the item master.");
-//                    alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            LayoutInflater inflater = LayoutInflater.from(InventoryCountDetailsActivity.this);
-//                            final View newItemDialog = inflater.inflate(R.layout.add_new_item, null);
-//
-//                            final EditText etVendorItem = newItemDialog.findViewById(R.id.vendorItem);
-//                            final EditText etItemDescription = newItemDialog.findViewById(R.id.item_description);
-//
-//                            final EditText etItemCost = newItemDialog.findViewById(R.id.item_cost);
-//                            final EditText etUnitOfMeasure = newItemDialog.findViewById(R.id.unit_of_measure);
-//                            final EditText etQuantity = newItemDialog.findViewById(R.id.etQuantity);
-//
-//                            etVendorItem.setText(scannedVendorItem);
-//
-//
-//                            addNewItemDialog = new AlertDialog.Builder(InventoryCountDetailsActivity.this)
-//                                    .setTitle("Enter item information")
-//                                    .setView(newItemDialog)
-//                                    .setPositiveButton("OK", null)
-//                                    .setNegativeButton("Cancel", null).create();
-//
-//                            addNewItemDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-//                                @Override
-//                                public void onShow(DialogInterface dialog) {
-//                                    Button okButton = addNewItemDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-//                                    etVendorItem.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//                                        @Override
-//                                        public void onFocusChange(View v, boolean hasFocus) {
-//                                            etVendorItem.post(new Runnable() {
-//                                                @Override
-//                                                public void run() {
-//                                                    InputMethodManager inputMethodManager = (InputMethodManager) InventoryCountDetailsActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-//                                                    inputMethodManager.showSoftInput(etVendorItem, InputMethodManager.SHOW_IMPLICIT);
-//                                                }
-//                                            });
-//                                        }
-//                                    });
-//                                    etVendorItem.requestFocus();
-//                                    etVendorItem.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//                                        @Override
-//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                                            etItemDescription.requestFocus();
-//                                            return false;
-//                                        }
-//                                    });
-//                                    etItemDescription.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//                                        @Override
-//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                                            etItemCost.requestFocus();
-//                                            return false;
-//                                        }
-//                                    });
-//                                    etItemCost.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//                                        @Override
-//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                                            etUnitOfMeasure.requestFocus();
-//                                            return false;
-//                                        }
-//                                    });
-//                                    etUnitOfMeasure.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//                                        @Override
-//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                                            etQuantity.requestFocus();
-//                                            return false;
-//                                        }
-//                                    });
-//                                    etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//                                        @Override
-//                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                                            createItem(etVendorItem, etItemDescription, etItemCost, etUnitOfMeasure, etQuantity);
-//                                            addNewItemDialog.dismiss();
-//                                            return false;
-//                                        }
-//                                    });
-//                                    okButton.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            createItem(etVendorItem, etItemDescription, etItemCost, etUnitOfMeasure, etQuantity);
-//                                            addNewItemDialog.dismiss();
-//
-//                                        }
-//                                    });
-//                                }
-//                            });
-//                            addNewItemDialog.show();
-//
-//
-//                        }
-//                    });
                     alertDialogBuilder.setPositiveButton("OK", null);
-                    //commented line below to block the adding new item function
-                    //alertDialogBuilder.setNegativeButton("No", null);
                     AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.show();
                 }
@@ -600,7 +545,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         });
     }
 
-    public void retrofitCallInventoryCountDetailAddUpdate(TextView etVendorItem, TextView etItemDescription, TextView etItemCost, TextView etQuantity, TextView etUnitOfMeasure) {
+    public void retrofitCallInventoryCountDetailAddUpdate(TextView etVendorItem, TextView etItemDescription, TextView etItemCost, TextView etQuantity, TextView etUnitOfMeasure, int areaId) {
 
 
         // Build the Json Request
@@ -611,6 +556,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         jsonParams.put("vendorItem", etVendorItem.getText().toString());
         jsonParams.put("itemDescription", etItemDescription.getText().toString());
         jsonParams.put("cost", etItemCost.getText().toString());
+        jsonParams.put("areaId", String.valueOf(actualAreaId));
         /************************** Code Enhancement for phase 2 : begin****************************/
         //jsonParams.put("quantity", etQuantity.getText().toString());
         if (addMoreQty)
@@ -627,6 +573,11 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         progressBarVisibility.showProgress(true);
 
         Call<ResponseBody> call;
+        /************************** Code Enhancement for phase 2 : begin****************************/
+        //Adding the areaId to the condition to determine if an item already scanned for the current week or not: If the item is already scanned
+        //and it is within the current selected area then call the inventoryupdate method, if the item is alrady scanned but it is in a different area than the current selected area,
+        // then call createinventory method. This code before phase 2 was using department only to check in an inventory exist. Now where adding the area code as well
+
         if (isInventoryCountExist == false)
             call = InventoryCountDetailsRetrofit.getInstance()
                     .getInventoryCountDetailsApi().createInventoryCountDetail(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser()
@@ -636,7 +587,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             call = InventoryCountDetailsRetrofit.getInstance()
                     .getInventoryCountDetailsApi().updateInventoryCountDetail(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser()
                             .getToken(), inventoryCount);
-
+/************************** Code Enhancement for phase 2 : end****************************/
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -1031,28 +982,56 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 /************************** Code Enhancement for phase 2 : Begin**************************/
         switch (v.getId()) {
             case (R.id.btn_sales_floor):
-                if (isBtnSalesFloorPressed) isBtnSalesFloorPressed = false;
-                else isBtnSalesFloorPressed = true;
+
+                if (isBtnSalesFloorPressed) {
+                    isBtnSalesFloorPressed = false;
+                    manipulatedAreaId -= 6;
+                } else {
+                    isBtnSalesFloorPressed = true;
+                    manipulatedAreaId += 6;
+                }
+
                 filterBasedOnAreaSelected(isBtnSalesFloorPressed, btnSalesFloor, 1);
+
                 break;
             case (R.id.btn_backroom):
-                if (isBtnBackroomPressed) isBtnBackroomPressed = false;
-                else isBtnBackroomPressed = true;
+                if (isBtnBackroomPressed) {
+                    isBtnBackroomPressed = false;
+                    manipulatedAreaId -= 7;
+                } else {
+                    isBtnBackroomPressed = true;
+                    manipulatedAreaId += 7;
+                }
                 filterBasedOnAreaSelected(isBtnBackroomPressed, btnBackroom, 2);
                 break;
             case (R.id.btn_cooler):
-                if (isBtnCoolerPressed) isBtnCoolerPressed = false;
-                else isBtnCoolerPressed = true;
+                if (isBtnCoolerPressed) {
+                    isBtnCoolerPressed = false;
+                    manipulatedAreaId -= 8;
+                } else {
+                    isBtnCoolerPressed = true;
+                    manipulatedAreaId += 8;
+                }
                 filterBasedOnAreaSelected(isBtnCoolerPressed, btnCooler, 3);
                 break;
             case (R.id.btn_freezer):
-                if (isBtnFreezerPressed) isBtnFreezerPressed = false;
-                else isBtnFreezerPressed = true;
+                if (isBtnFreezerPressed) {
+                    isBtnFreezerPressed = false;
+                    manipulatedAreaId -= 9;
+                } else {
+                    isBtnFreezerPressed = true;
+                    manipulatedAreaId += 9;
+                }
                 filterBasedOnAreaSelected(isBtnFreezerPressed, btnFreezer, 4);
                 break;
             case (R.id.btn_supplies):
-                if (isBtnSuppliesPressed) isBtnSuppliesPressed = false;
-                else isBtnSuppliesPressed = true;
+                if (isBtnSuppliesPressed) {
+                    isBtnSuppliesPressed = false;
+                    manipulatedAreaId -= 10;
+                } else {
+                    isBtnSuppliesPressed = true;
+                    manipulatedAreaId += 10;
+                }
                 filterBasedOnAreaSelected(isBtnSuppliesPressed, btnSupplies, 5);
                 break;
 
@@ -1094,9 +1073,26 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
                     try {
-                        if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate()))
-                            retrofitCallItemDetails(etVendorItem.getText().toString());
-                        else {
+                        if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate())) {
+                            actualAreaId = areaId(manipulatedAreaId);
+                            if (actualAreaId >= 1 && actualAreaId <= 5)
+                                retrofitCallItemDetails(etVendorItem.getText().toString());
+                            else if (actualAreaId == 0) {
+                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                                alertDialogBuilder.setTitle("Select An Area");
+                                alertDialogBuilder.setMessage("Please select an area to start scanning.");
+                                alertDialogBuilder.setPositiveButton("OK", null);
+                                AlertDialog alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                            } else {
+                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                                alertDialogBuilder.setTitle("Multiple Areas Selected");
+                                alertDialogBuilder.setMessage("More than one area is selected. Please select one area only.");
+                                alertDialogBuilder.setPositiveButton("OK", null);
+                                AlertDialog alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                            }
+                        } else {
                             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
                             alertDialogBuilder.setTitle("Week closed!");
                             alertDialogBuilder.setMessage("The selected week is closed. Scanning is allowed for the current week only.");
@@ -1119,9 +1115,26 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                         public void onClick(DialogInterface dialog, int whichButton) {
                             String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
                             try {
-                                if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate()))
-                                    retrofitCallItemDetails(etVendorItem.getText().toString());
-                                else {
+                                if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate())) {
+                                    actualAreaId = areaId(manipulatedAreaId);
+                                    if (actualAreaId >= 1 && actualAreaId <= 5)
+                                        retrofitCallItemDetails(etVendorItem.getText().toString());
+                                    else if (actualAreaId == 0) {
+                                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                                        alertDialogBuilder.setTitle("Select An Area");
+                                        alertDialogBuilder.setMessage("Please select an area to start scanning.");
+                                        alertDialogBuilder.setPositiveButton("OK", null);
+                                        AlertDialog alertDialog = alertDialogBuilder.create();
+                                        alertDialog.show();
+                                    } else {
+                                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                                        alertDialogBuilder.setTitle("Multiple Areas Selected");
+                                        alertDialogBuilder.setMessage("More than one area is selected. Please select one area only.");
+                                        alertDialogBuilder.setPositiveButton("OK", null);
+                                        AlertDialog alertDialog = alertDialogBuilder.create();
+                                        alertDialog.show();
+                                    }
+                                } else {
                                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
                                     alertDialogBuilder.setTitle("Week closed!");
                                     alertDialogBuilder.setMessage("The selected week is closed. Scanning is allowed for the current week only.");
@@ -1147,7 +1160,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             String departmentId = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getDepartmentId().toString();
             String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
 
-            String url = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws/inventorycounts/totalInventory/"
+            String url = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws-dev/inventorycounts/totalInventory/"
                     + storeId + "/" + departmentId + "/" + weekEndDate + "/" + "inventory.csv?token=" + token; // missing 'http://' will cause crashed
             Uri uri = Uri.parse(url);
             DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
@@ -1211,9 +1224,26 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             //allow scanning only if the selected week is the current week
             String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
             try {
-                if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate()))
-                    retrofitCallItemDetails(result);
-                else {
+                if (weekEndDate.equals(Utils.getInstance().getCurrentWeekEndDate())) {
+                    actualAreaId = areaId(manipulatedAreaId);
+                    if (actualAreaId >= 1 && actualAreaId <= 5)
+                        retrofitCallItemDetails(result);
+                    else if (actualAreaId == 0) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                        alertDialogBuilder.setTitle("Select An Area");
+                        alertDialogBuilder.setMessage("Please select an area to start scanning.");
+                        alertDialogBuilder.setPositiveButton("OK", null);
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                    } else {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
+                        alertDialogBuilder.setTitle("Multiple Areas Selected");
+                        alertDialogBuilder.setMessage("More than one area is selected. Please select one area only.");
+                        alertDialogBuilder.setPositiveButton("OK", null);
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                    }
+                } else {
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
                     alertDialogBuilder.setTitle("Week closed!");
                     alertDialogBuilder.setMessage("The selected week is closed. Scanning is allowed for the current week only.");
@@ -1221,6 +1251,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                     AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.show();
                 }
+
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -1240,74 +1271,6 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
 
             textViewStatus.setText("Status: " + result);
         }
-    }
-
-    private void createItem(final EditText etVendorItem, final EditText etDescription, final EditText etItemCost, final EditText etUnitOfMeasure, final EditText etQuantity) {
-
-        String vendorItem = etVendorItem.getText().toString().trim();
-        String description = etDescription.getText().toString().trim();
-        String itemCost = etItemCost.getText().toString().trim();
-        String unitOfMeasure = etUnitOfMeasure.getText().toString().trim();
-
-        if (vendorItem.isEmpty()) {
-            etVendorItem.setError("VendorItem is required");
-            etVendorItem.requestFocus();
-            return;
-        }
-        if (description.isEmpty()) {
-            etDescription.setError("Item description is required");
-            etDescription.requestFocus();
-            return;
-        }
-        if (itemCost.isEmpty()) {
-            etItemCost.setError("Item cost is required");
-            etItemCost.requestFocus();
-            return;
-        }
-        if (unitOfMeasure.isEmpty()) {
-            etUnitOfMeasure.setError("Unit of measure is required");
-            etUnitOfMeasure.requestFocus();
-            return;
-        }
-
-        // call the store api and populate the store spinner
-        Map<String, String> jsonParams = new ArrayMap<>();
-        jsonParams.put("vendorItem", vendorItem);
-        jsonParams.put("storeId", SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getStoreId());
-        jsonParams.put("description", description);
-        jsonParams.put("cost", itemCost);
-        jsonParams.put("unitOfMeasure", unitOfMeasure);
-        jsonParams.put("itemMaster", "false");
-
-        RequestBody newItem = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), new JSONObject(jsonParams).toString());
-
-        progressBarVisibility = new ProgressBarVisibility(InventoryCountDetailsActivity.this, vInventoryCountDetailsForm, vProgressBar);
-        progressBarVisibility.showProgress(true);
-
-        Call<ResponseBody> call = ItemRetrofit.getInstance().getItemApi().createItem(SharedPrefManager.getInstance(InventoryCountDetailsActivity.this).getUuser().getToken(), newItem);
-
-        call.enqueue(new Callback<ResponseBody>() {
-
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
-                progressBarVisibility.showProgress(false);
-                retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etDescription, etItemCost, etQuantity, etUnitOfMeasure);
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                progressBarVisibility.showProgress(false);
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(InventoryCountDetailsActivity.this);
-                alertDialogBuilder.setTitle("The Service is down");
-                alertDialogBuilder.setMessage("The Service is down. Please try again later");
-                alertDialogBuilder.setPositiveButton("OK", null);
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-
-            }
-        });
     }
 
     /************************** Code Enhancement for phase 2 : Begin**************************/
@@ -1335,11 +1298,14 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                 //shake the etquantity editText if the value entered is greater than 999
                 if (quantity * Double.valueOf(etItemCost.getText().toString()) > 1000) {
                     //change the textColor of the quantity box
-                    etQuantity.setTextColor(getResources().getColor(R.color.Red));
+                    etQuantity.setTextColor(getResources().getColor(R.color.Yellow));
                     Animation shake = AnimationUtils.loadAnimation(InventoryCountDetailsActivity.this, R.anim.shake);
                     etQuantity.startAnimation(shake);
-                    Toast toast = Toast.makeText(InventoryCountDetailsActivity.this, "The inventory for this item is greater than $1000.00", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(InventoryCountDetailsActivity.this, "WARNING:\n The inventory for this item is greater than $1000.00", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
+                    View view = toast.getView();
+                    TextView toastMessage = view.findViewById(android.R.id.message);
+                    toastMessage.setTextColor(getResources().getColor(R.color.Yellow));
                     toast.show();
                 } else
                     etQuantity.setTextColor(getResources().getColor(R.color.White));
@@ -1348,31 +1314,35 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
     }
 
     //add a filter based on the area selected
-    public void filterBasedOnAreaSelected(boolean isButtonPressed, Button btn, double quantity) {
+    public void filterBasedOnAreaSelected(boolean isButtonPressed, Button btn, double areaId) {
         if (isButtonPressed) {
+
             //change the background and the text color
             Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btn, true);
             btn.setTextColor(getResources().getColor(R.color.White));
-            //add the Supplies area filter
+            //add the selected area filter
             Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
             for (InventoryCountDetails icd : inventoryCountDetailsIterator) {
-                if (icd.getQuantity() == quantity) {
+                if (icd.getAreaId() == areaId) {
                     filteredInventoryCounts.add(icd);
                     Collections.sort(filteredInventoryCounts, new Comparator<InventoryCountDetails>() {
                         @Override
                         public int compare(InventoryCountDetails o1, InventoryCountDetails o2) {
-                            if (!o2.getDateUpdated().equals(null))
+                            if (o2.getDateUpdated() != null)
                                 return o2.getDateUpdated().compareTo(o1.getDateUpdated());
                             return 0;
                         }
 
                     });
 
+
                 }
             }
-            inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, filteredInventoryCounts);
-            recyclerView.setAdapter(inventoyCountDetailsAdapter);
+            inventoryCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, filteredInventoryCounts);
+            recyclerView.setAdapter(inventoryCountDetailsAdapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivity.this));
+            //Recalculate the total by the selected areas
+            calculateTotalInventoryByArea(filteredInventoryCounts);
         } else {
 
             Utils.getInstance().setBtnPressed(InventoryCountDetailsActivity.this, btn, false);
@@ -1381,12 +1351,12 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             //remove the inventory when the button is unpressed
             Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
             for (InventoryCountDetails icd : inventoryCountDetailsIterator) {
-                if (icd.getQuantity() == quantity) {
+                if (areaId == icd.getAreaId()) {
                     filteredInventoryCounts.remove(icd);
                     Collections.sort(filteredInventoryCounts, new Comparator<InventoryCountDetails>() {
                         @Override
                         public int compare(InventoryCountDetails o1, InventoryCountDetails o2) {
-                            if (!o2.getDateUpdated().equals(null))
+                            if (o2.getDateUpdated() != null)
                                 return o2.getDateUpdated().compareTo(o1.getDateUpdated());
                             return 0;
                         }
@@ -1396,15 +1366,56 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                 }
             }
 
-            if (filteredInventoryCounts.size() > 0)
-                inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, filteredInventoryCounts);
-            else
-                inventoyCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, inventoryCounts);
-            recyclerView.setAdapter(inventoyCountDetailsAdapter);
+            if (filteredInventoryCounts.size() > 0 || isAnyAreaSelected()) {
+                inventoryCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, filteredInventoryCounts);
+                //Recalculate the total by the selected areas
+                calculateTotalInventoryByArea(filteredInventoryCounts);
+            } else {
+                inventoryCountDetailsAdapter = new InventoyCountDetailsAdapter(InventoryCountDetailsActivity.this, inventoryCounts);
+                //Recalculate the total by the selected areas
+                calculateTotalInventoryByArea(inventoryCounts);
+            }
+            recyclerView.setAdapter(inventoryCountDetailsAdapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(InventoryCountDetailsActivity.this));
         }
-
-        //initial the forceOneTouch variable to zero
     }
+
+    public void calculateTotalInventoryByArea(Iterable<InventoryCountDetails> currentSelectedAreasInventoryCount) {
+        totalInventoryBySelectedAreas = 0;
+        for (InventoryCountDetails inventoryCountDetails : currentSelectedAreasInventoryCount) {
+            totalInventoryBySelectedAreas += inventoryCountDetails.getQuantity() * inventoryCountDetails.getCost();
+        }
+
+        //using the String.format to make the Double with 2 decimals only
+        textViewInventoryTotalByArea.setText("$".concat(String.format(Locale.US, "%,.2f", totalInventoryBySelectedAreas)));
+    }
+
+    public int areaId(int areaId) {
+        switch (areaId) {
+            case 6:
+                areaId = 1;
+                break;
+            case 7:
+                areaId = 2;
+                break;
+            case 8:
+                areaId = 3;
+                break;
+            case 9:
+                areaId = 4;
+                break;
+            case 10:
+                areaId = 5;
+                break;
+        }
+        return areaId;
+    }
+
     /************************** Code Enhancement for phase 2 : End**************************/
+
+    public boolean isAnyAreaSelected() {
+        if (isBtnSalesFloorPressed || isBtnBackroomPressed || isBtnCoolerPressed || isBtnFreezerPressed || isBtnSuppliesPressed)
+            return true;
+        return false;
+    }
 }
