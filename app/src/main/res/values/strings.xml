@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Perishables Inventory</string>
+    <string name="app_name">Perishables Test</string>
     <!-- Strings related to login -->
     <string name="username">Username</string>
     <string name="password">Password</string>

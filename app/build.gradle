@@ -3,11 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.elrancho.pwi.pwi_app"
+        applicationId "com.elrancho.pwi.pwi_app_dev"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 3
-        versionName "1.3"
+        versionCode 4
+        versionName "1.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

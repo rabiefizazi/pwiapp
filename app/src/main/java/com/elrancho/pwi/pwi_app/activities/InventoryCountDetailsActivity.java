@@ -1,4 +1,4 @@
-package com.elrancho.pwi.pwi_app.activities;
+package com.elrancho.pwi.pwi_app.activities;//-------------------
 
 
 import android.Manifest;
@@ -368,8 +368,8 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                         Iterable<InventoryCountDetails> inventoryCountDetailsIterator = inventoryCounts;
                         for (InventoryCountDetails icd : inventoryCountDetailsIterator) {
                             if ((icd.getVendorItem() - vendorItem) == 0) {
-                                etQuantity.setText(String.valueOf(icd.getQuantity()));
                                 /************************** Code Enhancement for phase 2 : begin****************************/
+                                etQuantity.setText(String.valueOf(icd.getQuantity()));
                                 if (actualAreaId == icd.getAreaId())
                                 /************************** Code Enhancement for phase 2 : begin****************************/
                                     isInventoryCountExist = true;
@@ -559,8 +559,10 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
         jsonParams.put("areaId", String.valueOf(actualAreaId));
         /************************** Code Enhancement for phase 2 : begin****************************/
         //jsonParams.put("quantity", etQuantity.getText().toString());
-        if (addMoreQty)
+        if (addMoreQty){
             jsonParams.put("quantity", String.valueOf((Double.valueOf(etQuantity.getText().toString()) + quantityFound)));
+            addMoreQty=false;
+        }
         else
             jsonParams.put("quantity", etQuantity.getText().toString());
         /************************** Code Enhancement for phase 2 : end****************************/
