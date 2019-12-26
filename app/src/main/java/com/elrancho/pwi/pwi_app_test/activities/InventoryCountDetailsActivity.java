@@ -425,6 +425,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
                                 etQuantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                                     @Override
                                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
                                         retrofitCallInventoryCountDetailAddUpdate(etVendorItem, etItemDescription, etItemCost, etQuantity, etUnitOfMeasure, actualAreaId);
                                         enterQuantityDialog.dismiss();
                                         return false;
@@ -1170,7 +1171,7 @@ public class InventoryCountDetailsActivity extends AppCompatActivity implements 
             String departmentId = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getDepartmentId().toString();
             String weekEndDate = SharedPrefManagerInventorySummary.getInstance(InventoryCountDetailsActivity.this).getInventorySummary().getWeekEndDate();
 
-            String url = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws-dev/inventorycounts/totalInventory/"
+            String url = "http://ec2-3-90-133-23.compute-1.amazonaws.com:8080/pwi-app-ws/inventorycounts/totalInventory/"
                     + storeId + "/" + departmentId + "/" + weekEndDate + "/" + "inventory.csv?token=" + token; // missing 'http://' will cause crashed
             Uri uri = Uri.parse(url);
             DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
